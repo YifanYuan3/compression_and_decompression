@@ -5,3 +5,4 @@ you may reuse
 
 compress_unit.v and its sub-module trans.v
 
+but there is no 8-bit case in these module.
