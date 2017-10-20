@@ -1,0 +1,176 @@
+/*
+
+Vivado v2014.3.1 (64-bit)
+SW Build 1056140 on Thu Oct 30 16:30:39 MDT 2014
+Process ID: 486
+
+Current time: 	10/20/17 12:13:34 PM
+Time zone: 	Central Standard Time (America/Chicago)
+
+OS: NAME="Ubuntu"
+Version: 4.10.0-37-generic
+Architecture: amd64
+Available processors (cores): 8
+
+DISPLAY: :0
+Screen size: 1920x1080
+Screen resolution (DPI): 96
+Available screens: 1
+
+Java version: 	1.8.0_05 64-bit
+Java home: 	/home/yifany3/vivado2014/Vivado/2014.3.1/tps/lnx64/jre
+
+User name: 	yifany3
+User directory: /home/yifany3/Documents/current_comp
+User country: 	US
+User language: 	en
+User locale: 	en_US
+Vivado preferences path: /home/yifany3/.Xilinx/Vivado/2014.3/vivado.ini
+Vivado layouts directory: /home/yifany3/.Xilinx/Vivado/2014.3/layouts/application
+
+GUI allocated memory:	197 MB
+GUI max memory:		3,052 MB
+Engine allocated memory: 868 MB
+
+*/
+
+// TclEventType: START_GUI
+// TclEventType: PROJECT_OPEN_DIALOG
+// Tcl Message: start_gui 
+// TclEventType: PROJECT_OPEN_DIALOG
+// cn:P (ch:JFrame):  Open Project : addNotify
+// TclEventType: DEBUG_PROBE_SET_CHANGE
+// TclEventType: MSGMGR_MOVEMSG
+// TclEventType: FILE_SET_NEW
+// TclEventType: RUN_CURRENT
+// TclEventType: FILE_SET_CHANGE
+// TclEventType: PROJECT_NEW
+// [GUI Memory]: 38 MB (+37095kb) [00:00:03]
+// [Engine Memory]: 828 MB (+716515kb) [00:00:03]
+// [GUI Memory]: 58 MB (+20918kb) [00:00:03]
+// [Engine Memory]: 841 MB (+14086kb) [00:00:03]
+// [Engine Memory]: 860 MB (+19705kb) [00:00:03]
+// [Engine Memory]: 862 MB (+1703kb) [00:00:03]
+// [Engine Memory]: 864 MB (+2056kb) [00:00:04]
+// [Engine Memory]: 864 MB (+790kb) [00:00:04]
+// Tcl Message: open_project ./current_comp.xpr 
+// Tcl Message: Scanning sources... Finished scanning sources 
+// Tcl Message: INFO: [IP_Flow 19-234] Refreshing IP repositories INFO: [IP_Flow 19-1700] Loaded user IP repository '/home/yifany3/Documents/xt_conn_trd/xt_conn_trd.ipdefs/small_data_compression.srcs'. INFO: [IP_Flow 19-2313] Loaded Vivado IP repository '/home/yifany3/vivado2014/Vivado/2014.3.1/data/ip'. 
+// [Engine Memory]: 867 MB (+2850kb) [00:00:04]
+// [Engine Memory]: 867 MB (+135kb) [00:00:04]
+// [Engine Memory]: 867 MB (+65kb) [00:00:04]
+// [Engine Memory]: 868 MB (+327kb) [00:00:04]
+// [Engine Memory]: 868 MB (+139kb) [00:00:04]
+// [Engine Memory]: 869 MB (+1179kb) [00:00:04]
+// TclEventType: FILE_SET_OPTIONS_CHANGE
+// [Engine Memory]: 874 MB (+5132kb) [00:00:04]
+// TclEventType: FILE_SET_OPTIONS_CHANGE
+// [Engine Memory]: 877 MB (+3801kb) [00:00:04]
+// TclEventType: FILE_SET_OPTIONS_CHANGE
+// [Engine Memory]: 886 MB (+9187kb) [00:00:04]
+// TclEventType: FILE_SET_OPTIONS_CHANGE
+// [Engine Memory]: 886 MB (+393kb) [00:00:04]
+// TclEventType: FILE_SET_OPTIONS_CHANGE
+// [Engine Memory]: 887 MB (+135kb) [00:00:04]
+// TclEventType: FILE_SET_OPTIONS_CHANGE
+// [Engine Memory]: 887 MB (+131kb) [00:00:04]
+// TclEventType: FILE_SET_OPTIONS_CHANGE
+// [Engine Memory]: 887 MB (+65kb) [00:00:04]
+// TclEventType: FILE_SET_OPTIONS_CHANGE
+// [Engine Memory]: 887 MB (+135kb) [00:00:04]
+// TclEventType: FILE_SET_OPTIONS_CHANGE
+// [Engine Memory]: 887 MB (+331kb) [00:00:05]
+// [Engine Memory]: 887 MB (+200kb) [00:00:05]
+// [Engine Memory]: 888 MB (+131kb) [00:00:05]
+// [Engine Memory]: 888 MB (+135kb) [00:00:05]
+// TclEventType: FILE_SET_OPTIONS_CHANGE
+// [Engine Memory]: 888 MB (+131kb) [00:00:05]
+// TclEventType: FILE_SET_OPTIONS_CHANGE
+// [Engine Memory]: 888 MB (+135kb) [00:00:05]
+// TclEventType: FILE_SET_OPTIONS_CHANGE
+// [Engine Memory]: 888 MB (+65kb) [00:00:05]
+// TclEventType: FILE_SET_OPTIONS_CHANGE
+// [Engine Memory]: 888 MB (+65kb) [00:00:05]
+// TclEventType: FILE_SET_OPTIONS_CHANGE
+// [Engine Memory]: 888 MB (+135kb) [00:00:05]
+// TclEventType: FILE_SET_OPTIONS_CHANGE
+// [Engine Memory]: 888 MB (+65kb) [00:00:05]
+// TclEventType: FILE_SET_OPTIONS_CHANGE
+// [Engine Memory]: 888 MB (+65kb) [00:00:05]
+// TclEventType: FILE_SET_OPTIONS_CHANGE
+// [Engine Memory]: 888 MB (+69kb) [00:00:05]
+// [Engine Memory]: 888 MB (+65kb) [00:00:05]
+// [Engine Memory]: 889 MB (+262kb) [00:00:05]
+// [Engine Memory]: 889 MB (+65kb) [00:00:05]
+// TclEventType: FILE_SET_OPTIONS_CHANGE
+// [Engine Memory]: 891 MB (+1957kb) [00:00:05]
+// TclEventType: FILE_SET_OPTIONS_CHANGE
+// [Engine Memory]: 893 MB (+2183kb) [00:00:05]
+// TclEventType: FILE_SET_OPTIONS_CHANGE
+// [Engine Memory]: 893 MB (+65kb) [00:00:05]
+// TclEventType: FILE_SET_OPTIONS_CHANGE
+// [Engine Memory]: 893 MB (+65kb) [00:00:05]
+// TclEventType: FILE_SET_OPTIONS_CHANGE
+// [Engine Memory]: 893 MB (+65kb) [00:00:05]
+// TclEventType: FILE_SET_OPTIONS_CHANGE
+// [Engine Memory]: 895 MB (+1773kb) [00:00:05]
+// [Engine Memory]: 896 MB (+1220kb) [00:00:05]
+// [Engine Memory]: 896 MB (+65kb) [00:00:05]
+// TclEventType: FILE_SET_OPTIONS_CHANGE
+// [Engine Memory]: 896 MB (+65kb) [00:00:05]
+// TclEventType: FILE_SET_OPTIONS_CHANGE
+// [Engine Memory]: 896 MB (+69kb) [00:00:05]
+// TclEventType: FILE_SET_OPTIONS_CHANGE
+// [Engine Memory]: 896 MB (+65kb) [00:00:05]
+// TclEventType: FILE_SET_OPTIONS_CHANGE
+// [Engine Memory]: 896 MB (+65kb) [00:00:05]
+// TclEventType: FILE_SET_OPTIONS_CHANGE
+// Project name: current_comp; location: /home/yifany3/Documents/current_comp; part: xc7vx690tffg1761-2
+// [Engine Memory]: 896 MB (+135kb) [00:00:05]
+dismissDialog("Open Project"); // cn:P (ch:JFrame)
+// [Engine Memory]: 897 MB (+929kb) [00:00:05]
+// TclEventType: DG_UPDATE_GRAPH
+// TclEventType: DG_ANALYSIS_MSG_RESET
+// [Engine Memory]: 899 MB (+1527kb) [00:00:06]
+// HMemoryUtils.trashcanNow. Engine heap size: 909 MB. GUI used memory: 24 MB. Current time: 10/20/17 12:13:36 PM
+// [Engine Memory]: 937 MB (+40681kb) [00:00:08]
+// TclEventType: DG_UPDATE_GRAPH
+// TclEventType: FILE_SET_CHANGE
+// [Engine Memory]: 945 MB (+7720kb) [00:00:09]
+// TclEventType: DG_UPDATE_GRAPH
+// TclEventType: DG_ANALYSIS_MSG_RESET
+// TclEventType: DG_UPDATE_GRAPH
+// [Engine Memory]: 947 MB (+2256kb) [00:00:09]
+// [Engine Memory]: 947 MB (+65kb) [00:00:09]
+// [Engine Memory]: 947 MB (+65kb) [00:00:09]
+// Tcl Message: update_compile_order -fileset sources_1 
+// [Engine Memory]: 948 MB (+602kb) [00:00:11]
+// TclEventType: FILE_SET_CHANGE
+// [Engine Memory]: 948 MB (+528kb) [00:00:13]
+// [Engine Memory]: 948 MB (+397kb) [00:00:15]
+// Elapsed time: 10 seconds
+expandTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Design Sources, system_design (system_design.v)]", 1); // u:k (H:JPanel, ch:JFrame)
+// [Engine Memory]: 949 MB (+266kb) [00:00:16]
+expandTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Design Sources, system_design (system_design.v), comp_unit - compression_design (compression_design.v)]", 3); // u:k (H:JPanel, ch:JFrame)
+collapseTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Design Sources, system_design (system_design.v), comp_unit - compression_design (compression_design.v)]", 3); // u:k (H:JPanel, ch:JFrame)
+expandTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Design Sources, system_design (system_design.v), comp_unit - compression_design (compression_design.v)]", 3); // u:k (H:JPanel, ch:JFrame)
+collapseTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Design Sources, system_design (system_design.v), comp_unit - compression_design (compression_design.v)]", 3); // u:k (H:JPanel, ch:JFrame)
+// [Engine Memory]: 950 MB (+860kb) [00:00:19]
+expandTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Design Sources, system_design (system_design.v), comp_unit - compression_design (compression_design.v)]", 3); // u:k (H:JPanel, ch:JFrame)
+// [Engine Memory]: 950 MB (+401kb) [00:00:22]
+// [Engine Memory]: 950 MB (+131kb) [00:00:26]
+// [Engine Memory]: 950 MB (+69kb) [00:00:31]
+// [Engine Memory]: 950 MB (+65kb) [00:00:36]
+// [Engine Memory]: 950 MB (+65kb) [00:00:41]
+// [Engine Memory]: 950 MB (+200kb) [00:00:46]
+// [Engine Memory]: 952 MB (+1310kb) [00:01:06]
+// Elapsed time: 43 seconds
+selectTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Design Sources, system_design (system_design.v), comp_unit - compression_design (compression_design.v), comp_unit1 - compress_unit (compress_unit.v)]", 4, true); // u:k (H:JPanel, ch:JFrame) - Node
+// [Engine Memory]: 953 MB (+1048kb) [00:01:06]
+selectTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Design Sources, system_design (system_design.v), comp_unit - compression_design (compression_design.v), comp_unit1 - compress_unit (compress_unit.v)]", 4, true, false, false, false, false, true); // u:k (H:JPanel, ch:JFrame) - Double Click - Node
+// [Engine Memory]: 956 MB (+3809kb) [00:01:06]
+// [Engine Memory]: 957 MB (+266kb) [00:01:06]
+// [Engine Memory]: 957 MB (+860kb) [00:01:10]
+// [Engine Memory]: 957 MB (+65kb) [00:01:54]
+// TclEventType: FILE_SET_CHANGE
+// [GUI Memory]: 59 MB (+1416kb) [00:05:34]

@@ -1,0 +1,12 @@
+#-----------------------------------------------------------
+# Vivado v2014.3.1 (64-bit)
+# SW Build 1056140 on Thu Oct 30 16:30:39 MDT 2014
+# IP Build 1028902 on Fri Sep 26 17:35:13 MDT 2014
+# Start of session at: Fri Oct 20 12:10:53 2017
+# Process ID: 342
+# Log file: /home/yifany3/Documents/current_comp/vivado.log
+# Journal file: /home/yifany3/Documents/current_comp/vivado.jou
+#-----------------------------------------------------------
+start_gui
+open_project current_comp.xpr
+update_compile_order -fileset sources_1

@@ -1,0 +1,18 @@
+#-----------------------------------------------------------
+# Vivado v2014.3.1 (64-bit)
+# SW Build 1056140 on Thu Oct 30 16:30:39 MDT 2014
+# IP Build 1028902 on Fri Sep 26 17:35:13 MDT 2014
+# Start of session at: Fri Oct 20 12:13:25 2017
+# Process ID: 486
+# Log file: /home/yifany3/Documents/current_comp/vivado.log
+# Journal file: /home/yifany3/Documents/current_comp/vivado.jou
+#-----------------------------------------------------------
+start_gui
+open_project ./current_comp.xpr
+WARNING: [filemgmt 56-99] Vivado Synthesis ignores library specification for Verilog or SystemVerilog files. [/home/yifany3/Documents/current_comp/current_comp.srcs/sources_1/imports/yifany3/vivado2014/Vivado/2014.3.1/data/ip/xilinx/blk_mem_gen_v8_2/simulation/blk_mem_gen_v8_2.v:]
+Scanning sources...
+Finished scanning sources
+INFO: [IP_Flow 19-234] Refreshing IP repositories
+INFO: [IP_Flow 19-1700] Loaded user IP repository '/home/yifany3/Documents/xt_conn_trd/xt_conn_trd.ipdefs/small_data_compression.srcs'.
+INFO: [IP_Flow 19-2313] Loaded Vivado IP repository '/home/yifany3/vivado2014/Vivado/2014.3.1/data/ip'.
+update_compile_order -fileset sources_1
