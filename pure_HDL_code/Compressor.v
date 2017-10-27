@@ -17,9 +17,9 @@ module Compressor #(
 	wire		[LEN_WIDTH  - 1	: 0]			len			[0 : 7];
 
 /**
-	Debug
-	This code needs to be uncommented to activate the compress_unit modules
-	Plus, cprData and tag need to be deleted from input lists
+	[Debug]
+		This code needs to be uncommented to activate the compress_unit modules
+		Plus, cprData and tag need to be deleted from input lists
 
 	wire 		[DATA_WIDTH - 1 : 0]			cprData [0 : 7];
 	wire		[TAG_WIDTH  - 1 : 0]			tag			[0 : 7];
@@ -33,9 +33,11 @@ module Compressor #(
 	compress_unit cu0 (clk, reset, wrtEn, dataIn [DATA_WIDTH * 1 - 1 : DATA_WIDTH * 0], cprData	[0], tag[0]);
 */
 
-	// Debug
-	// cprData and tag should not come as an inputs to this Compressor module
-	// The following 18 lines should be deleted eventually
+/**
+	[Debug]
+		cprData and tag should not come as an inputs to this Compressor module
+		The following 18 lines should be deleted eventually
+*/
 	wire		[DATA_WIDTH - 1 : 0]			cprData [0 : 7];	
 	assign cprData[7] = cprDataIn [DATA_WIDTH * 8 - 1 : DATA_WIDTH * 7];
 	assign cprData[6] = cprDataIn [DATA_WIDTH * 7 - 1 : DATA_WIDTH * 6];
@@ -54,8 +56,6 @@ module Compressor #(
 	assign tag[2] = tagIn [TAG_WIDTH * 3 - 1 : TAG_WIDTH * 2];
 	assign tag[1] = tagIn [TAG_WIDTH * 2 - 1 : TAG_WIDTH * 1];
 	assign tag[0] = tagIn [TAG_WIDTH * 1 - 1 : TAG_WIDTH * 0];
-
-
 
 
 
