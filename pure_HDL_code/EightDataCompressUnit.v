@@ -20,17 +20,21 @@ module EightDataCompressUnit #(
 //	generate 
 // 		for (i = 0; i < `NUM_COMPRESS_UNITS; i = i + 1)
 // 		begin: CU
+//
 // 			wire 		[DATA_WIDTH - 1 : 0]			cprData
 // 			wire		[TAG_WIDTH  - 1 : 0]			tag;
 // 			wire 		[LEN_WIDTH  - 1 : 0]			len;
-// 			compress_unit cu (
-// 										clk, 
-// 										reset, 
-// 										wrtEn, 
-// 										dataIn [DATA_WIDTH * (i + 1) - 1 : DATA_WIDTH * i], 
-// 										cprData, 
-// 										tag
+//
+// 			compress_unit 
+// 				cu (
+// 				clk, 
+// 				reset, 
+// 				wrtEn, 
+// 				dataIn [DATA_WIDTH * (i + 1) - 1 : DATA_WIDTH * i], 
+// 				cprData, 
+// 				tag
 // 			);
+//
 // 			Tag2Len #(
 // 				.TAG_WIDTH(TAG_WIDTH), 
 // 				.LEN_WIDTH(LEN_WIDTH)
@@ -38,23 +42,31 @@ module EightDataCompressUnit #(
 // 				tag, 
 // 				len
 // 			);
+//
 // 		end
 // 	endgenerate
 	generate
 		for (i = 0; i < `NUM_COMPRESS_UNITS; i = i + 1)
 		begin: CU
-			wire [DATA_WIDTH - 1 : 0] cprData;
-			wire [TAG_WIDTH  - 1 : 0]	tag;				
-			wire [LEN_WIDTH  - 1 : 0]	len;
-			assign cprData = cprDataIn [DATA_WIDTH * (i + 1) - 1 : DATA_WIDTH * i];
-			assign tag     = tagIn     [TAG_WIDTH  * (i + 1) - 1 : TAG_WIDTH  * i];
+			
+			wire [DATA_WIDTH - 1 : 0] cprData, 	tmpCprData;
+			wire [TAG_WIDTH  - 1 : 0]	tag, 			tmpTag;				
+			wire [LEN_WIDTH  - 1 : 0]	len, 			tmpLen;
+			
+			assign tmpCprData = cprDataIn [DATA_WIDTH * (i + 1) - 1 : DATA_WIDTH * i];
+			assign tmpTag     = tagIn     [TAG_WIDTH  * (i + 1) - 1 : TAG_WIDTH  * i];
+			
 			Tag2Len #(
 				.TAG_WIDTH(TAG_WIDTH), 
 				.LEN_WIDTH(LEN_WIDTH)
 			) tu (
-				tag, 
-				len
+				tmpTag, 
+				tmpLen
 			);
+			
+			Register #(.BIT_WIDTH(DATA_WIDTH))	cprDataReg 	(clk, reset, wrtEn, tmpCprData, cprData);
+			Register #(.BIT_WIDTH(TAG_WIDTH ))	tagReg 			(clk, reset, wrtEn, tmpTag, 		tag);
+			Register #(.BIT_WIDTH(LEN_WIDTH ))	lenReg 			(clk, reset, wrtEn, tmpLen, 		len);
 		end
 	endgenerate
 		
