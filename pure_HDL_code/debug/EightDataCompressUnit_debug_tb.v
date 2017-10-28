@@ -2,9 +2,9 @@
 
 module EightDataCompressUnit_tb;
 
-	reg 						clk;
-	reg							reset;
-	reg 						wrtEn; 
+	reg 										clk;
+	reg											reset;
+	reg 										wrtEn; 
 	reg 	[32 * 8 - 1 : 0]	dataIn;
 	reg 	[32 * 8 - 1 : 0]	cprDataIn;	// debug
 	reg		[2  * 8 - 1 : 0]  tagIn;		// debug

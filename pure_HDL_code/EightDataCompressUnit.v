@@ -16,33 +16,37 @@ module EightDataCompressUnit #(
 	output	[TAG_WIDTH  * `NUM_COMPRESS_UNITS - 1 : 0]	tagOut
 );
 	genvar i;
-
-//	generate 
+	
+// 	generate 
 // 		for (i = 0; i < `NUM_COMPRESS_UNITS; i = i + 1)
 // 		begin: CU
-//
-// 			wire 		[DATA_WIDTH - 1 : 0]			cprData
-// 			wire		[TAG_WIDTH  - 1 : 0]			tag;
-// 			wire 		[LEN_WIDTH  - 1 : 0]			len;
-//
+// 
+// 			wire 	[DATA_WIDTH - 1 : 0] cprData, 	tmpCprData;
+// 			wire 	[TAG_WIDTH  - 1 : 0]	tag, 			tmpTag;				
+// 			wire 	[LEN_WIDTH  - 1 : 0]	len, 			tmpLen;
+// 
 // 			compress_unit 
 // 				cu (
 // 				clk, 
 // 				reset, 
 // 				wrtEn, 
 // 				dataIn [DATA_WIDTH * (i + 1) - 1 : DATA_WIDTH * i], 
-// 				cprData, 
-// 				tag
+// 				tmpCprData, 
+// 				tmpTag
 // 			);
-//
+// 
 // 			Tag2Len #(
 // 				.TAG_WIDTH(TAG_WIDTH), 
 // 				.LEN_WIDTH(LEN_WIDTH)
 // 			) tu (
-// 				tag, 
-// 				len
+// 				tmpTag, 
+// 				tmpLen
 // 			);
-//
+// 
+// 			Register #(.BIT_WIDTH(DATA_WIDTH))	cprDataReg 	(clk, reset, wrtEn, tmpCprData, cprData);
+// 			Register #(.BIT_WIDTH(TAG_WIDTH ))	tagReg 			(clk, reset, wrtEn, tmpTag, 		tag);
+// 			Register #(.BIT_WIDTH(LEN_WIDTH ))	lenReg 			(clk, reset, wrtEn, tmpLen, 		len);
+// 
 // 		end
 // 	endgenerate
 	generate
