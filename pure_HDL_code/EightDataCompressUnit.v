@@ -1,67 +1,70 @@
+`define NUM_COMPRESS_UNITS 8
+
 module EightDataCompressUnit #(
-	parameter 												DATA_WIDTH = 32,
-	parameter 												TAG_WIDTH  = 2,
-	parameter													LEN_WIDTH  = 8
+	parameter 																					DATA_WIDTH = 32,
+	parameter 																					TAG_WIDTH  = 2,
+	parameter																						LEN_WIDTH  = 8
 )
 (
-	input															clk,
-	input															reset,
-	input															wrtEn,
-	input		[DATA_WIDTH * 8 - 1 : 0]	dataIn,
-	input		[DATA_WIDTH * 8 - 1 : 0]	cprDataIn,				// Debug: to be deleted
-	input		[TAG_WIDTH  * 8 - 1 : 0]	tagIn,						// Debug: to be deleted
-	output	[DATA_WIDTH * 8 - 1 : 0]	dataOut,
-	output	[TAG_WIDTH  * 8 - 1 : 0]	tagOut
+	input																								clk,
+	input																								reset,
+	input																								wrtEn,
+	input		[DATA_WIDTH * `NUM_COMPRESS_UNITS - 1 : 0]	dataIn,
+	input		[DATA_WIDTH * `NUM_COMPRESS_UNITS - 1 : 0]	cprDataIn,				// Debug: to be deleted
+	input		[TAG_WIDTH  * `NUM_COMPRESS_UNITS - 1 : 0]	tagIn,						// Debug: to be deleted
+	output	[DATA_WIDTH * `NUM_COMPRESS_UNITS - 1 : 0]	dataOut,
+	output	[TAG_WIDTH  * `NUM_COMPRESS_UNITS - 1 : 0]	tagOut
 );
-// 	wire 		[DATA_WIDTH - 1 : 0]			cprData [0 : 7];
-// 	wire		[TAG_WIDTH  - 1 : 0]			tag			[0 : 7];
-// 	compress_unit cu7 (clk, reset, wrtEn, dataIn [DATA_WIDTH * 8 - 1 : DATA_WIDTH * 7], cprData	[7], tag[7]);
-// 	compress_unit cu6 (clk, reset, wrtEn, dataIn [DATA_WIDTH * 7 - 1 : DATA_WIDTH * 6], cprData	[6], tag[6]);
-// 	compress_unit cu5 (clk, reset, wrtEn, dataIn [DATA_WIDTH * 6 - 1 : DATA_WIDTH * 5], cprData	[5], tag[5]);
-// 	compress_unit cu4 (clk, reset, wrtEn, dataIn [DATA_WIDTH * 5 - 1 : DATA_WIDTH * 4], cprData	[4], tag[4]);
-// 	compress_unit cu3 (clk, reset, wrtEn, dataIn [DATA_WIDTH * 4 - 1 : DATA_WIDTH * 3], cprData	[3], tag[3]);
-// 	compress_unit cu2 (clk, reset, wrtEn, dataIn [DATA_WIDTH * 3 - 1 : DATA_WIDTH * 2], cprData	[2], tag[2]);
-// 	compress_unit cu1 (clk, reset, wrtEn, dataIn [DATA_WIDTH * 2 - 1 : DATA_WIDTH * 1], cprData	[1], tag[1]);
-// 	compress_unit cu0 (clk, reset, wrtEn, dataIn [DATA_WIDTH * 1 - 1 : DATA_WIDTH * 0], cprData	[0], tag[0]);
+	genvar i;
 
-	wire		[DATA_WIDTH - 1 : 0]			cprData [0 : 7];	
-	assign cprData[7] = cprDataIn [DATA_WIDTH * 8 - 1 : DATA_WIDTH * 7];
-	assign cprData[6] = cprDataIn [DATA_WIDTH * 7 - 1 : DATA_WIDTH * 6];
-	assign cprData[5] = cprDataIn [DATA_WIDTH * 6 - 1 : DATA_WIDTH * 5];
-	assign cprData[4] = cprDataIn [DATA_WIDTH * 5 - 1 : DATA_WIDTH * 4];
-	assign cprData[3] = cprDataIn [DATA_WIDTH * 4 - 1 : DATA_WIDTH * 3];
-	assign cprData[2] = cprDataIn [DATA_WIDTH * 3 - 1 : DATA_WIDTH * 2];
-	assign cprData[1] = cprDataIn [DATA_WIDTH * 2 - 1 : DATA_WIDTH * 1];
-	assign cprData[0] = cprDataIn [DATA_WIDTH * 1 - 1 : DATA_WIDTH * 0];
-	wire		[TAG_WIDTH - 1 : 0]				tag 		[0 : 7];	
-	assign tag[7] = tagIn [TAG_WIDTH * 8 - 1 : TAG_WIDTH * 7];
-	assign tag[6] = tagIn [TAG_WIDTH * 7 - 1 : TAG_WIDTH * 6];
-	assign tag[5] = tagIn [TAG_WIDTH * 6 - 1 : TAG_WIDTH * 5];
-	assign tag[4] = tagIn [TAG_WIDTH * 5 - 1 : TAG_WIDTH * 4];
-	assign tag[3] = tagIn [TAG_WIDTH * 4 - 1 : TAG_WIDTH * 3];
-	assign tag[2] = tagIn [TAG_WIDTH * 3 - 1 : TAG_WIDTH * 2];
-	assign tag[1] = tagIn [TAG_WIDTH * 2 - 1 : TAG_WIDTH * 1];
-	assign tag[0] = tagIn [TAG_WIDTH * 1 - 1 : TAG_WIDTH * 0];
-
-
-
-	wire		[LEN_WIDTH  - 1	: 0]			len			[0 : 7];
-  Tag2Len #(.TAG_WIDTH(TAG_WIDTH), .LEN_WIDTH(LEN_WIDTH)) tl7 (tag[7], len[7]);
-  Tag2Len #(.TAG_WIDTH(TAG_WIDTH), .LEN_WIDTH(LEN_WIDTH)) tl6 (tag[6], len[6]);
-  Tag2Len #(.TAG_WIDTH(TAG_WIDTH), .LEN_WIDTH(LEN_WIDTH)) tl5 (tag[5], len[5]);
-  Tag2Len #(.TAG_WIDTH(TAG_WIDTH), .LEN_WIDTH(LEN_WIDTH)) tl4 (tag[4], len[4]);
-  Tag2Len #(.TAG_WIDTH(TAG_WIDTH), .LEN_WIDTH(LEN_WIDTH)) tl3 (tag[3], len[3]);
-  Tag2Len #(.TAG_WIDTH(TAG_WIDTH), .LEN_WIDTH(LEN_WIDTH)) tl2 (tag[2], len[2]);
-  Tag2Len #(.TAG_WIDTH(TAG_WIDTH), .LEN_WIDTH(LEN_WIDTH)) tl1 (tag[1], len[1]);
-  Tag2Len #(.TAG_WIDTH(TAG_WIDTH), .LEN_WIDTH(LEN_WIDTH)) tl0 (tag[0], len[0]);
+//	generate 
+// 		for (i = 0; i < `NUM_COMPRESS_UNITS; i = i + 1)
+// 		begin: CU
+// 			wire 		[DATA_WIDTH - 1 : 0]			cprData
+// 			wire		[TAG_WIDTH  - 1 : 0]			tag;
+// 			wire 		[LEN_WIDTH  - 1 : 0]			len;
+// 			compress_unit cu (
+// 										clk, 
+// 										reset, 
+// 										wrtEn, 
+// 										dataIn [DATA_WIDTH * (i + 1) - 1 : DATA_WIDTH * i], 
+// 										cprData, 
+// 										tag
+// 			);
+// 			Tag2Len #(
+// 				.TAG_WIDTH(TAG_WIDTH), 
+// 				.LEN_WIDTH(LEN_WIDTH)
+// 			) tu (
+// 				tag, 
+// 				len
+// 			);
+// 		end
+// 	endgenerate
+	generate
+		for (i = 0; i < `NUM_COMPRESS_UNITS; i = i + 1)
+		begin: CU
+			wire [DATA_WIDTH - 1 : 0] cprData;
+			wire [TAG_WIDTH  - 1 : 0]	tag;				
+			wire [LEN_WIDTH  - 1 : 0]	len;
+			assign cprData = cprDataIn [DATA_WIDTH * (i + 1) - 1 : DATA_WIDTH * i];
+			assign tag     = tagIn     [TAG_WIDTH  * (i + 1) - 1 : TAG_WIDTH  * i];
+			Tag2Len #(
+				.TAG_WIDTH(TAG_WIDTH), 
+				.LEN_WIDTH(LEN_WIDTH)
+			) tu (
+				tag, 
+				len
+			);
+		end
+	endgenerate
 		
 	wire 		[DATA_WIDTH * 2 - 1 : 0] mgOut00, mgOut01, mgOut02, mgOut03;
 	wire 		[TAG_WIDTH  * 2 - 1 : 0] mgTag00, mgTag01, mgTag02, mgTag03;
 	wire 		[LEN_WIDTH      - 1 : 0] mgLen00, mgLen01, mgLen02, mgLen03;
-  Merger #(.DATA_WIDTH(DATA_WIDTH),	.TAG_WIDTH(TAG_WIDTH), .LEN_WIDTH(LEN_WIDTH)) mg03 (clk, reset, wrtEn, cprData[7], tag[7], len[7],	cprData[6], tag[6], len[6], mgOut03, mgTag03, mgLen03);
-  Merger #(.DATA_WIDTH(DATA_WIDTH),	.TAG_WIDTH(TAG_WIDTH), .LEN_WIDTH(LEN_WIDTH)) mg02 (clk, reset, wrtEn, cprData[5], tag[5], len[5],	cprData[4], tag[4], len[4], mgOut02, mgTag02, mgLen02);
-  Merger #(.DATA_WIDTH(DATA_WIDTH),	.TAG_WIDTH(TAG_WIDTH), .LEN_WIDTH(LEN_WIDTH)) mg01 (clk, reset, wrtEn, cprData[3], tag[3], len[3],	cprData[2], tag[2], len[2], mgOut01, mgTag01, mgLen01);
-  Merger #(.DATA_WIDTH(DATA_WIDTH),	.TAG_WIDTH(TAG_WIDTH), .LEN_WIDTH(LEN_WIDTH)) mg00 (clk, reset, wrtEn, cprData[1], tag[1], len[1],	cprData[0], tag[0], len[0], mgOut00, mgTag00, mgLen00);
+  Merger #(.DATA_WIDTH(DATA_WIDTH),	.TAG_WIDTH(TAG_WIDTH), .LEN_WIDTH(LEN_WIDTH)) mg03 (clk, reset, wrtEn, CU[7].cprData, CU[7].tag, CU[7].len,	CU[6].cprData, CU[6].tag, CU[6].len, mgOut03, mgTag03, mgLen03);
+  Merger #(.DATA_WIDTH(DATA_WIDTH),	.TAG_WIDTH(TAG_WIDTH), .LEN_WIDTH(LEN_WIDTH)) mg02 (clk, reset, wrtEn, CU[5].cprData, CU[5].tag, CU[5].len,	CU[4].cprData, CU[4].tag, CU[4].len, mgOut02, mgTag02, mgLen02);
+  Merger #(.DATA_WIDTH(DATA_WIDTH),	.TAG_WIDTH(TAG_WIDTH), .LEN_WIDTH(LEN_WIDTH)) mg01 (clk, reset, wrtEn, CU[3].cprData, CU[3].tag, CU[3].len,	CU[2].cprData, CU[2].tag, CU[2].len, mgOut01, mgTag01, mgLen01);
+  Merger #(.DATA_WIDTH(DATA_WIDTH),	.TAG_WIDTH(TAG_WIDTH), .LEN_WIDTH(LEN_WIDTH)) mg00 (clk, reset, wrtEn, CU[1].cprData, CU[1].tag, CU[1].len,	CU[0].cprData, CU[0].tag, CU[0].len, mgOut00, mgTag00, mgLen00);
   
 	wire		[DATA_WIDTH * 4 - 1 : 0] mgOut10, mgOut11;
 	wire 		[TAG_WIDTH  * 4 - 1 : 0] mgTag10, mgTag11;
