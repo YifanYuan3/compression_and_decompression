@@ -14,6 +14,7 @@ module Compressor (
 	output	[`TAG_WIDTH  * `NUM_DATA - 1 : 0]		tagOut
 );
 	
+	wire [`LEN_WIDTH - 1 : 0] lenOut;
   EightDataCompressUnit #(
   	.DATA_WIDTH	(`DATA_WIDTH),
   	.TAG_WIDTH	(`TAG_WIDTH	),
@@ -26,6 +27,8 @@ module Compressor (
   	cprDataIn, 
   	tagIn, 
   	dataOut, 
-  	tagOut);
+  	tagOut,
+  	lenOut
+  );
   	
 endmodule

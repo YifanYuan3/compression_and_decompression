@@ -13,7 +13,8 @@ module EightDataCompressUnit #(
 	input		[DATA_WIDTH * `NUM_COMPRESS_UNITS - 1 : 0]	cprDataIn,				// Debug: to be deleted
 	input		[TAG_WIDTH  * `NUM_COMPRESS_UNITS - 1 : 0]	tagIn,						// Debug: to be deleted
 	output	[DATA_WIDTH * `NUM_COMPRESS_UNITS - 1 : 0]	dataOut,
-	output	[TAG_WIDTH  * `NUM_COMPRESS_UNITS - 1 : 0]	tagOut
+	output	[TAG_WIDTH  * `NUM_COMPRESS_UNITS - 1 : 0]	tagOut,
+	output  [LEN_WIDTH                        - 1 : 0]  lenOut
 );
 	genvar i;
 	
@@ -93,7 +94,8 @@ module EightDataCompressUnit #(
 	wire 		[LEN_WIDTH      - 1 : 0] mgLen20;	
 	Merger #(.DATA_WIDTH(DATA_WIDTH * 4), .TAG_WIDTH(TAG_WIDTH * 4), .LEN_WIDTH(LEN_WIDTH)) mg20 (clk, reset, wrtEn, mgOut11, mgTag11, mgLen11, mgOut10, mgTag10, mgLen10,	mgOut20, mgTag20, mgLen20);
 	
-	assign dataOut = mgOut20;
-	assign tagOut  = mgTag20;
+	assign dataOut 	= mgOut20;
+	assign tagOut  	= mgTag20;
+	assign lenOut 	= mgLen20;
 		
 endmodule

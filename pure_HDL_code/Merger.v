@@ -23,13 +23,14 @@ module Merger #(
 	wire    [TAG_WIDTH  * 2 - 1 : 0] 	mergedTag;
 	wire    [LEN_WIDTH      - 1 : 0] 	mergedLen;
 
-	Shifter #(.DATA_WIDTH(DATA_WIDTH), .LEN_WIDTH(LEN_WIDTH)) sh (dataIn1, inLen0, inLen1, shiftedDataIn1, mergedLen);
+	Shifter #(.DATA_WIDTH(DATA_WIDTH), .LEN_WIDTH(LEN_WIDTH)) sh (dataIn1, inLen0, inLen1, shiftedDataIn1);
 	
 	assign mergedOut = (dataIn0 << DATA_WIDTH) | shiftedDataIn1;
 	assign mergedTag = (inTag0 << TAG_WIDTH)   | inTag1;
+	assign mergedLen = inLen0 + inLen1;
 	
 	Register #(.BIT_WIDTH(DATA_WIDTH * 2))	outreg (clk, reset, wrtEn, mergedOut, dataOut);
 	Register #(.BIT_WIDTH(TAG_WIDTH  * 2))	tagreg (clk, reset, wrtEn, mergedTag, outTag);
-	Register #(.BIT_WIDTH(LEN_WIDTH))				lenreg (clk, reset, wrtEn, mergedLen, outLen);
+	Register #(.BIT_WIDTH(LEN_WIDTH     ))	lenreg (clk, reset, wrtEn, mergedLen, outLen);
 
 endmodule

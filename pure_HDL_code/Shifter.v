@@ -6,8 +6,7 @@ module Shifter #(
 	input 		[DATA_WIDTH     - 1 : 0]		dataIn,
 	input 		[LEN_WIDTH      - 1 : 0]		len0,
 	input 		[LEN_WIDTH      - 1 : 0]		len1,
-	output 		[DATA_WIDTH * 2 - 1 : 0]		dataOut,
-	output		[LEN_WIDTH      - 1 : 0]		addedLen
+	output 		[DATA_WIDTH * 2 - 1 : 0]		dataOut
 );
 	wire 			[LEN_WIDTH      - 1 : 0]   	bitlen;
 	wire 		  [DATA_WIDTH * 2 - 1 : 0]		tmpDataOut0;
@@ -17,5 +16,4 @@ module Shifter #(
 	assign 		tmpDataOut0  	= dataIn;
 	assign 		tmpDataOut1		= tmpDataOut0 << DATA_WIDTH;
 	assign 		dataOut  			= tmpDataOut1 >> bitlen;	
-	assign 		addedLen 			= len0 + len1;
 endmodule

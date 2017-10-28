@@ -10,6 +10,7 @@ module EightDataCompressUnit_tb;
 	reg		[2  * 8 - 1 : 0]  tagIn;		// debug
 	wire  [32 * 8 - 1 : 0]  dataOut;
 	wire	[2  * 8 - 1 : 0]  tagOut;
+	wire  [7          : 0]  lenOut;
 	
 	initial 
 	begin
@@ -49,7 +50,18 @@ module EightDataCompressUnit_tb;
 		$finish;
 	end
   
-  EightDataCompressUnit cu8 (clk, reset, wrtEn, dataIn, cprDataIn, tagIn, dataOut, tagOut);
+  EightDataCompressUnit 
+  	cu8 (
+  	clk, 
+  	reset, 
+  	wrtEn, 
+  	dataIn, 
+  	cprDataIn, 
+  	tagIn, 
+  	dataOut, 
+  	tagOut, 
+  	lenOut
+  );
   
   always #1 clk = ~clk;
   
