@@ -1,6 +1,6 @@
 `timescale 1ns/1ns
 
-module Compressor_tb;
+module EightDataCompressUnit_tb;
 
 	reg 						clk;
 	reg							reset;
@@ -49,14 +49,14 @@ module Compressor_tb;
 		$finish;
 	end
   
-  Compressor cprs (clk, reset, wrtEn, dataIn, cprDataIn, tagIn, dataOut, tagOut);
+  EightDataCompressUnit cu8 (clk, reset, wrtEn, dataIn, cprDataIn, tagIn, dataOut, tagOut);
   
   always #1 clk = ~clk;
   
   initial
   begin
-    $dumpfile("compressor.vcd");
-    $dumpvars(0, Compressor_tb);
+    $dumpfile("EightDataCompressUnit.vcd");
+    $dumpvars(0, EightDataCompressUnit_tb);
   end
 
 endmodule
