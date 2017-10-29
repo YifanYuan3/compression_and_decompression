@@ -11,27 +11,25 @@ module DataStreamer #(
 	input 		[LEN_WIDTH  		- 1	: 0] 	len,
 	output		[DATA_OUT_WIDTH - 1 : 0] 	dataOut,
 	output															valid,
-	output		[LEN_WIDTH  		    : 0] 	newLenSum
+	output		[LEN_WIDTH  		    : 0] 	remainedDataOut
 );
 	wire																valid;
 
-	wire 			[LEN_WIDTH  				: 0]  shiftedLen;
-	wire 			[LEN_WIDTH  				: 0]  totalLen;
-	wire 			[LEN_WIDTH  				: 0] 	lenSum;
+	wire 			[LEN_WIDTH  				: 0]  inDataLen;
+	wire 			[LEN_WIDTH  				: 0]  mergedLen;
+	wire 			[LEN_WIDTH  				: 0] 	remainedDataIn;
 
-	assign shiftedLen = len << 3;
-	assign totalLen   = lenSum + shiftedLen + 16;
-	assign valid 			= (totalLen > 256) ? 1'b1 : 1'b0;
-	assign newLenSum  = valid ? totalLen - 256 : totalLen;
+	assign inDataLen = len << 3;
+	assign mergedLen   = remainedDataOut + inDataLen + 16;
+	assign valid 			= (mergedLen > 256) ? 1'b1 : 1'b0;
+	assign remainedDataIn   = valid ? mergedLen - 256 : mergedLen;
 	
-	Register #(
-		.BIT_WIDTH(LEN_WIDTH + 1)
-	) lenreg (
-		clk,
-		reset,
-		wrtEn,
-		newLenSum,
-		lenSum
-	);
+	Register #(.BIT_WIDTH(LEN_WIDTH + 1)) lenReg 			(clk, reset, wrtEn, remainedDataIn, remainedDataOut);
+
+	wire			[DATA_OUT_WIDTH - 1 : 0]	packedData;
+	
+	
+
+// 	Register #(.BIT_WIDTH(DATA_OUT_WIDTH)) outDataReg0 (clk, reset, wrtEn, )
 
 endmodule

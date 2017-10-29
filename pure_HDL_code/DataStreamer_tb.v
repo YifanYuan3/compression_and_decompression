@@ -19,7 +19,7 @@ module DataStreamer_tb;
 		reset = 1;
 		wrtEn = 1;
 		dataIn = 0;
-		len = 32;
+		len = 16;
 		@(negedge clk);
 		reset = 0;
 		@(negedge clk);
