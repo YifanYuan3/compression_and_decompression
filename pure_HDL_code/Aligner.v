@@ -14,8 +14,9 @@ module Aligner #(
 	output															stall
 );
 	wire																valid;
-	wire																stall_in;
-	wire																stall_out;
+	wire																stall;
+// 	wire																stall_in;
+// 	wire																stall_out;
 	wire 			[LEN_WIDTH  				: 0]  in_data_len;
 	wire 			[LEN_WIDTH  		+ 1	: 0]  merged_len;
 	wire 			[LEN_WIDTH  				: 0] 	remained_len_in;
@@ -23,11 +24,10 @@ module Aligner #(
 
 	assign in_data_len 				= len << 3;
 	assign merged_len   			= remained_len_out + in_data_len;
-	assign valid_in 					= (merged_len >= 256) ? 1'b1 : 1'b0;
 	assign remained_len_in   	= valid_in ? merged_len - 256 : merged_len;
-	assign stall_in						= merged_len >= 512 ? 1'b1 : 1'b0;
+	assign valid_in 					= (merged_len >= 256) ? 1'b1 : 1'b0;
 	assign valid 							= valid_in;
-	assign stall							= stall_out;
+	assign stall							= merged_len >= 512 ? 1'b1 : 1'b0;
 	
 	Register #(
 		.BIT_WIDTH(1)
@@ -39,16 +39,6 @@ module Aligner #(
 		valid_out
 	);
 	
-	Register #(
-		.BIT_WIDTH(1)
-	) stall_reg (
-		clk, 
-		reset, 
-		wrt_en, 
-		stall_in, 
-		stall_out
-	);
-
 	Register #(
 		.BIT_WIDTH(LEN_WIDTH + 1)
 	) len_reg (
