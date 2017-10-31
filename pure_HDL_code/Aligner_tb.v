@@ -5,11 +5,16 @@ module Aligner_tb;
 	reg 							clk;
 	reg								reset;
 	reg								wrt_en;
-	reg								push;
-	reg								pop;
-	wire							empty;
-	wire							full;
-	wire							almost_full;
+	reg								push0;
+	reg								pop0;
+	wire							empty0;
+	wire							full0;
+	wire							almost_full0;
+	reg								push1;
+	reg								pop1;
+	wire							empty1;
+	wire							full1;
+	wire							almost_full1;
 	reg   [15  : 0]   tag_out;
 	reg   [255 : 0]   cpr_data_out;
 	reg   [7   : 0]   len_out;
@@ -20,53 +25,63 @@ module Aligner_tb;
 	wire							stall;
 	wire  [8   : 0]   new_len;
 	wire  [8   : 0]   cur_len;
-	wire  [279 : 0]   align_in_data;
-	wire  [8   : 0]   fifo_count;
+	wire  [279 : 0]   aligner_in;
+	wire  [279 : 0]   fifo_out0;
+	wire  [8   : 0]   fifo_count0;
+	wire  [255 : 0]   fifo_out1;
+	wire  [8   : 0]   fifo_count1;
 	
 	initial 
 	begin
-		
-		clk = 0;
+		clk = 1;
 		reset = 1;
 		wrt_en = 1;
-		data_in = 0;
-		push = 0;
-		pop = 0;
-		len = 16;
-		@(negedge clk);
-		push = 1;
+		push0 = 0;
+		pop0 = 0;
+		push1 = 0;
+		pop1 = 0;
+		@(posedge clk);
+		push0 = 1;
 		reset = 0;
-		tag_out = 16'h46DB;
-		cpr_data_out = 256'h1234_5678_9ABC_DEF1_2345_6789_ABCD_EF00_0000_0000_0000_0000_0000_0000_0000_0000;
-		len_out = 8'h0F;
-		@(negedge clk);
-		tag_out = 16'hA964;
-		cpr_data_out = 256'h1234_5678_9ABC_DEF1_2345_6700_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000;
-		len_out = 8'h0B;
-		@(negedge clk);
-		tag_out = 16'h0625;
-		cpr_data_out = 256'h3456_789A_BCDE_F100_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000;
-		len_out = 8'h07;
-		@(negedge clk);
-		tag_out = 16'h800B;
-		cpr_data_out = 256'h1234_5678_9ABC_DEF1_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000;
-		len_out = 8'h08;
-		@(negedge clk);
-		tag_out = 16'h0000;
-		cpr_data_out = 256'h0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000;
-		len_out = 8'h00;
-		@(negedge clk);
-		tag_out = 16'hFFFF;
-		cpr_data_out = 256'h1234_5678_9ABC_DEF1_2345_6789_ABCD_EF12_3456_789A_BCDE_F123_4567_89AB_CDEF_1234;
-		len_out = 8'h20;
-		@(negedge clk);
-		@(negedge clk);
-		@(negedge clk);
-		@(negedge clk);
-		@(negedge clk);
-		@(negedge clk);		
+		cpr_data_out = 256'h0000_0000_0000_0000_0000_0000_A987_6543_21FE_DCBA_9876_5432_1FED_CBA9_8765_4321;
+		tag_out		= 16'b1010101010101111;
+		len_out = 8'h16;
+		$display("fifo_out1 %h", fifo_out1);
+		@(posedge clk);
+		pop0 = 1;
+		if (empty1 == 1'b0) 
+			pop1 = 1'b1;
+		else
+			pop1 = 1'b0;
+		$display("fifo_out1 %h", fifo_out1);
+		@(posedge clk);
+		if (empty1 == 1'b0) 
+			pop1 = 1'b1;
+		else
+			pop1 = 1'b0;
+		$display("fifo_out1 %h", fifo_out1);
+		@(posedge clk);
+		if (empty1 == 1'b0) 
+			pop1 = 1'b1;
+		else
+			pop1 = 1'b0;
+		$display("fifo_out1 %h", fifo_out1);
+		@(posedge clk);
+		@(posedge clk);
+		@(posedge clk);
+		@(posedge clk);
+		@(posedge clk);
+		@(posedge clk);
+		@(posedge clk);
+		@(posedge clk);
+		@(posedge clk);
+		@(posedge clk);
+		@(posedge clk);
+		@(posedge clk);
 		$finish;
 	end
+  
+  assign aligner_in = (empty0 == 1'b0 & pop0 == 1'b1) ? fifo_out0 : 0;
   
   FIFO #(
   	.DATA_WIDTH (280),	 // 16 + 256 + 8
@@ -74,30 +89,45 @@ module Aligner_tb;
   ) fifo0 (
   	clk,
   	reset,
-  	push,
-  	pop,
-  	{tag_out, cpr_data_out, len_out}, 
-  	align_in_data,
-  	empty,
-  	full,
-  	almostfull,
-  	fifo_count
+  	push0,
+  	pop0,
+  	{cpr_data_out, tag_out, len_out}, 
+  	fifo_out0,
+  	empty0,
+  	full0,
+  	almostfull0,
+  	fifo_count0
   );
   
   Aligner #(
   	.DATA_IN_WIDTH (272),
 		.LEN_WIDTH (8),
 		.DATA_OUT_WIDTH (256)
-  )	ds (
+  )	al0 (
   	clk, 
   	reset, 
   	wrt_en, 
-  	align_in_data [279 : 8], // tag + cpr_data
-  	align_in_data [7   : 0], // len 
+  	aligner_in [279 : 8], // tag + cpr_data
+  	aligner_in [7   : 0], // len 
   	data_out, 
   	valid, 
-  	stall,
-  	new_len
+  	stall
+  );
+  
+  FIFO #(
+  	.DATA_WIDTH (256),	 
+  	.ADDR_WIDTH (8)
+  ) fifo1 (
+  	clk,
+  	reset,
+  	valid,
+  	pop1,
+  	data_out, 
+  	fifo_out1,
+  	empty1,
+  	full1,
+  	almostfull1,
+  	fifo_count1
   );
   
   always #1 clk = ~clk;

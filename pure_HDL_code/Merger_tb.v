@@ -35,10 +35,10 @@ module Merger_tb;
 		clk = 0;
 		reset = 0;
 		wrtEn = 1;
-		dataIn0 = 32'h4567_0000;
+		dataIn0 = 32'h0000_4321;
 		inTag0 = 2'b10;
 		inLen0 = 8'b00000010;
-		dataIn1 = 32'h89AB_CDEF;
+		dataIn1 = 32'hCBA9_8765;
 		inTag1 = 2'b11;
 		inLen1 = 8'b00000100;
 		@(negedge clk);
@@ -46,7 +46,7 @@ module Merger_tb;
 		$finish;
 	end
   
-  Merger #(.DATA_WIDTH(32), .TAG_WIDTH(2), .LEN_WIDTH(8)) mg (clk, reset, wrtEn, dataIn0, inTag0, inLen0, dataIn1, inTag1, inLen1, dataOut, outTag, outLen);
+  Merger #(.DATA_WIDTH(32), .TAG_WIDTH(2), .LEN_WIDTH(8)) mg (clk, reset, wrtEn, dataIn1, inTag1, inLen1, dataIn0, inTag0, inLen0, dataOut, outTag, outLen);
   
   always #1 clk = ~clk;
   

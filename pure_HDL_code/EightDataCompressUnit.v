@@ -10,57 +10,30 @@ module EightDataCompressUnit #(
 	input																								reset,
 	input																								wrtEn,
 	input		[DATA_WIDTH * `NUM_COMPRESS_UNITS - 1 : 0]	dataIn,
-	input		[DATA_WIDTH * `NUM_COMPRESS_UNITS - 1 : 0]	cprDataIn,				// Debug: to be deleted
-	input		[TAG_WIDTH  * `NUM_COMPRESS_UNITS - 1 : 0]	tagIn,						// Debug: to be deleted
 	output	[DATA_WIDTH * `NUM_COMPRESS_UNITS - 1 : 0]	dataOut,
 	output	[TAG_WIDTH  * `NUM_COMPRESS_UNITS - 1 : 0]	tagOut,
 	output  [LEN_WIDTH                        - 1 : 0]  lenOut
 );
 	genvar i;
 	
-// 	generate 
-// 		for (i = 0; i < `NUM_COMPRESS_UNITS; i = i + 1)
-// 		begin: CU
-// 
-// 			wire 	[DATA_WIDTH - 1 : 0] cprData, 	tmpCprData;
-// 			wire 	[TAG_WIDTH  - 1 : 0]	tag, 			tmpTag;				
-// 			wire 	[LEN_WIDTH  - 1 : 0]	len, 			tmpLen;
-// 
-// 			compress_unit 
-// 				cu (
-// 				clk, 
-// 				reset, 
-// 				wrtEn, 
-// 				dataIn [DATA_WIDTH * (i + 1) - 1 : DATA_WIDTH * i], 
-// 				tmpCprData, 
-// 				tmpTag
-// 			);
-// 
-// 			Tag2Len #(
-// 				.TAG_WIDTH(TAG_WIDTH), 
-// 				.LEN_WIDTH(LEN_WIDTH)
-// 			) tu (
-// 				tmpTag, 
-// 				tmpLen
-// 			);
-// 
-// 			Register #(.BIT_WIDTH(DATA_WIDTH))	cprDataReg 	(clk, reset, wrtEn, tmpCprData, cprData);
-// 			Register #(.BIT_WIDTH(TAG_WIDTH ))	tagReg 			(clk, reset, wrtEn, tmpTag, 		tag);
-// 			Register #(.BIT_WIDTH(LEN_WIDTH ))	lenReg 			(clk, reset, wrtEn, tmpLen, 		len);
-// 
-// 		end
-// 	endgenerate
-	generate
+	generate 
 		for (i = 0; i < `NUM_COMPRESS_UNITS; i = i + 1)
 		begin: CU
-			
-			wire [DATA_WIDTH - 1 : 0] cprData, 	tmpCprData;
-			wire [TAG_WIDTH  - 1 : 0]	tag, 			tmpTag;				
-			wire [LEN_WIDTH  - 1 : 0]	len, 			tmpLen;
-			
-			assign tmpCprData = cprDataIn [DATA_WIDTH * (i + 1) - 1 : DATA_WIDTH * i];
-			assign tmpTag     = tagIn     [TAG_WIDTH  * (i + 1) - 1 : TAG_WIDTH  * i];
-			
+
+			wire 	[DATA_WIDTH - 1 : 0] cprData, 	tmpCprData;
+			wire 	[TAG_WIDTH  - 1 : 0]	tag, 			tmpTag;				
+			wire 	[LEN_WIDTH  - 1 : 0]	len, 			tmpLen;
+
+			compress_unit 
+				cu (
+				clk, 
+				reset, 
+				wrtEn, 
+				dataIn [DATA_WIDTH * (i + 1) - 1 : DATA_WIDTH * i], 
+				tmpCprData, 
+				tmpTag
+			);
+
 			Tag2Len #(
 				.TAG_WIDTH(TAG_WIDTH), 
 				.LEN_WIDTH(LEN_WIDTH)
@@ -68,12 +41,36 @@ module EightDataCompressUnit #(
 				tmpTag, 
 				tmpLen
 			);
-			
+
 			Register #(.BIT_WIDTH(DATA_WIDTH))	cprDataReg 	(clk, reset, wrtEn, tmpCprData, cprData);
 			Register #(.BIT_WIDTH(TAG_WIDTH ))	tagReg 			(clk, reset, wrtEn, tmpTag, 		tag);
 			Register #(.BIT_WIDTH(LEN_WIDTH ))	lenReg 			(clk, reset, wrtEn, tmpLen, 		len);
 		end
 	endgenerate
+// 	generate
+// 		for (i = 0; i < `NUM_COMPRESS_UNITS; i = i + 1)
+// 		begin: CU
+// 			
+// 			wire [DATA_WIDTH - 1 : 0] cprData, 	tmpCprData;
+// 			wire [TAG_WIDTH  - 1 : 0]	tag, 			tmpTag;				
+// 			wire [LEN_WIDTH  - 1 : 0]	len, 			tmpLen;
+// 			
+// 			assign tmpCprData = cprDataIn [DATA_WIDTH * (i + 1) - 1 : DATA_WIDTH * i];
+// 			assign tmpTag     = tagIn     [TAG_WIDTH  * (i + 1) - 1 : TAG_WIDTH  * i];
+// 			
+// 			Tag2Len #(
+// 				.TAG_WIDTH(TAG_WIDTH), 
+// 				.LEN_WIDTH(LEN_WIDTH)
+// 			) tu (
+// 				tmpTag, 
+// 				tmpLen
+// 			);
+// 			
+// 			Register #(.BIT_WIDTH(DATA_WIDTH))	cprDataReg 	(clk, reset, wrtEn, tmpCprData, cprData);
+// 			Register #(.BIT_WIDTH(TAG_WIDTH ))	tagReg 			(clk, reset, wrtEn, tmpTag, 		tag);
+// 			Register #(.BIT_WIDTH(LEN_WIDTH ))	lenReg 			(clk, reset, wrtEn, tmpLen, 		len);
+// 		end
+// 	endgenerate
 		
 	wire 		[DATA_WIDTH * 2 - 1 : 0] mgOut00, mgOut01, mgOut02, mgOut03;
 	wire 		[TAG_WIDTH  * 2 - 1 : 0] mgTag00, mgTag01, mgTag02, mgTag03;
@@ -96,6 +93,6 @@ module EightDataCompressUnit #(
 	
 	assign dataOut 	= mgOut20;
 	assign tagOut  	= mgTag20;
-	assign lenOut 	= mgLen20;
+	assign lenOut 	= mgLen20 + 2; // 16 bits for tags
 		
 endmodule

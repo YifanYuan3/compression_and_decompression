@@ -6,11 +6,9 @@ module EightDataCompressUnit_tb;
 	reg											reset;
 	reg 										wrtEn; 
 	reg 	[32 * 8 - 1 : 0]	dataIn;
-	reg 	[32 * 8 - 1 : 0]	cprDataIn;	// debug
-	reg		[2  * 8 - 1 : 0]  tagIn;		// debug
 	wire  [32 * 8 - 1 : 0]  dataOut;
 	wire	[2  * 8 - 1 : 0]  tagOut;
-	wire  [7          : 0]  lenOut;
+	wire  [7          : 0]  lenOut; 
 	
 	initial 
 	begin
@@ -19,33 +17,25 @@ module EightDataCompressUnit_tb;
 		reset = 0;
 		wrtEn = 1;
 		@(negedge clk);
-		
-		// len = F
-		cprDataIn = 256'h1200_0000_0000_0000_3400_0000_5678_0000_9ABC_DEF1_2300_0000_4567_0000_89AB_CDEF;
-		tagIn		= 16'b0100011011011011;
+// 		dataIn = 256'hFEDC_BA98_0000_7654_0000_0032_1FED_CBA9_0000_8765_0000_0043_0000_0000_0000_0021;
+		dataIn = 256'hFEDC_BA98_FEDC_BA98_FEDC_BA98_FEDC_BA98_FEDC_BA98_FEDC_BA98_FEDC_BA98_FEDC_BA98;
+		$display("dataOut %h", dataOut);
 		@(negedge clk);
-		// len = B
-		cprDataIn = 256'h1234_0000_5678_0000_9ABC_0000_DE00_0000_F100_0000_2345_0000_6700_0000_0000_0000;
-		tagIn		= 16'b1010100101100100;
+		$display("dataOut %h", dataOut);
 		@(negedge clk);
-		// len = 7
-		cprDataIn = 256'h0000_0000_0000_0000_3400_0000_5678_0000_0000_0000_9ABC_0000_DE00_0000_F100_0000;
-		tagIn		= 16'b0000011000100101;
+		$display("dataOut %h", dataOut);
 		@(negedge clk);
-		// len = 8
-		cprDataIn = 256'h1234_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_5678_0000_9ABC_DEF1;
-		tagIn		= 16'b1000000000001011;
+		$display("dataOut %h", dataOut);
 		@(negedge clk);
-		// len = 0
-		cprDataIn = 256'h0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000;
-		tagIn		= 16'b0000000000000000;
+		$display("dataOut %h", dataOut);
 		@(negedge clk);
-		// len = 20
-		cprDataIn = 256'h1234_5678_9ABC_DEF1_2345_6789_ABCD_EF12_3456_789A_BCDE_F123_4567_89AB_CDEF_1234;
-		tagIn		= 16'b1111111111111111;
+		$display("dataOut %h", dataOut);
 		@(negedge clk);
+		$display("dataOut %h", dataOut);
 		@(negedge clk);
+		$display("dataOut %h", dataOut);
 		@(negedge clk);
+		$display("dataOut %h", dataOut);
 		@(negedge clk);
 		$finish;
 	end
@@ -56,8 +46,6 @@ module EightDataCompressUnit_tb;
   	reset, 
   	wrtEn, 
   	dataIn, 
-  	cprDataIn, 
-  	tagIn, 
   	dataOut, 
   	tagOut, 
   	lenOut
@@ -67,7 +55,7 @@ module EightDataCompressUnit_tb;
   
   initial
   begin
-    $dumpfile("EightDataCompressUnit.vcd");
+    $dumpfile("eight.vcd");
     $dumpvars(0, EightDataCompressUnit_tb);
   end
 

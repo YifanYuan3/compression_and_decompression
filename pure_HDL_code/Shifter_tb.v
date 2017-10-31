@@ -17,25 +17,22 @@
 module Shifter_tb;
 
 	reg  [31:0] dataIn;
-	reg  [2:0]  len0;
-	reg  [2:0]  len1;
+	reg  [7:0]  len;
 	wire [63:0] dataOut;
 	wire [5:0]  addedLen;
 	
 	initial 
 	begin
 		dataIn = 0;
-		len0   = 0;
-		len1   = 0;
+		len   = 0;
 	  #3;
-		dataIn = 32'h22220000;
-		len0   = 3'b001;
-		len1   = 3'b010;
+		dataIn = 32'h00002222;
+		len   = 8'b00000001;
 		#3;
 	  $stop;
 	end
   
-  Shifter sh (dataIn, len0, len1, dataOut, addedLen);
+  Shifter sh (dataIn, len, dataOut);
   
   initial
   begin

@@ -14,38 +14,38 @@ module Compressor_tb;
 	initial 
 	begin
 		
-		clk = 0;
+		clk = 1;
 		reset = 0;
 		wrtEn = 1;
-		@(negedge clk);
+		@(posedge clk);
 		
 		// len = F
 		cprDataIn = 256'h1200_0000_0000_0000_3400_0000_5678_0000_9ABC_DEF1_2300_0000_4567_0000_89AB_CDEF;
 		tagIn		= 16'b0100011011011011;
-		@(negedge clk);
+		@(posedge clk);
 		// len = B
 		cprDataIn = 256'h1234_0000_5678_0000_9ABC_0000_DE00_0000_F100_0000_2345_0000_6700_0000_0000_0000;
 		tagIn		= 16'b1010100101100100;
-		@(negedge clk);
+		@(posedge clk);
 		// len = 7
 		cprDataIn = 256'h0000_0000_0000_0000_3400_0000_5678_0000_0000_0000_9ABC_0000_DE00_0000_F100_0000;
 		tagIn		= 16'b0000011000100101;
-		@(negedge clk);
+		@(posedge clk);
 		// len = 8
 		cprDataIn = 256'h1234_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_5678_0000_9ABC_DEF1;
 		tagIn		= 16'b1000000000001011;
-		@(negedge clk);
+		@(posedge clk);
 		// len = 0
 		cprDataIn = 256'h0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000;
 		tagIn		= 16'b0000000000000000;
-		@(negedge clk);
+		@(posedge clk);
 		// len = 20
 		cprDataIn = 256'h1234_5678_9ABC_DEF1_2345_6789_ABCD_EF12_3456_789A_BCDE_F123_4567_89AB_CDEF_1234;
 		tagIn		= 16'b1111111111111111;
-		@(negedge clk);
-		@(negedge clk);
-		@(negedge clk);
-		@(negedge clk);
+		@(posedge clk);
+		@(posedge clk);
+		@(posedge clk);
+		@(posedge clk);
 		$finish;
 	end
   
