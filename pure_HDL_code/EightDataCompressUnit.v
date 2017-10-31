@@ -99,8 +99,8 @@ module EightDataCompressUnit #(
 	Merger #(.DATA_WIDTH(DATA_WIDTH * 4), .TAG_WIDTH(TAG_WIDTH * 4), .LEN_WIDTH(LEN_WIDTH)) mg20 (clk, reset, wrtEn, mgOut11, mgTag11, mgLen11, mgOut10, mgTag10, mgLen10,	mgOut20, mgTag20, mgLen20);
 	Register #(.BIT_WIDTH(1)) valid3reg	(clk, reset, wrtEn, valid2, validOut);
 		
-	assign dataOut 	= mgOut20;
-	assign tagOut  	= mgTag20;
-	assign lenOut 	= mgLen20; // 16 bits for tags
+	assign dataOut 	= (validOut == 1'b1) ? mgOut20 : 0;
+	assign tagOut  	= (validOut == 1'b1) ? mgTag20 : 0;
+	assign lenOut 	= (validOut == 1'b1) ? mgLen20 + 2 : 0; // 16 bits for tags
 		
 endmodule
