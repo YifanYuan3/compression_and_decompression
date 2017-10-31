@@ -13,7 +13,7 @@ module Compressor (
 	output	[`DATA_WIDTH * `NUM_DATA - 1 	: 0]	data_out
 );
 	
-	wire 																				pop_infifo, empty_infifo, full_infifo, almost_full_infifo;
+	wire 																				push_infifo_, pop_infifo, pop_infifo_, empty_infifo, full_infifo, almost_full_infifo;
 	wire 		[`DATA_WIDTH * `NUM_DATA - 1 	: 0] 	infifo_out;
 	wire 		[`MEM_ADDR_WIDTH 							: 0] 	infifo_count;
 	Register #(
@@ -22,10 +22,11 @@ module Compressor (
 		clk, 
 		reset, 
 		wrt_en, 
-		push_infifo, 
+		pop_infifo_, 
 		pop_infifo
 	);
-// 	assign 	pop_infifo 	= (empty_infifo == 1'b0) ? 1'b1 : 1'b0;
+	assign 	push_infifo_	= (full_infifo 	== 1'b0) ? push_infifo : 1'b0;
+	assign 	pop_infifo_ 	= (empty_infifo == 1'b0) ? 1'b1 : 1'b0;
 	FIFO #(
   	.DATA_WIDTH (`DATA_WIDTH * `NUM_DATA),	 
   	.ADDR_WIDTH (`MEM_ADDR_WIDTH)
@@ -45,18 +46,18 @@ module Compressor (
 	wire 		[`DATA_WIDTH * `NUM_DATA 	- 1 : 0] 	cpr_in, cpr_out;
 	wire		[`TAG_WIDTH  * `NUM_DATA 	- 1 : 0]	tag_out;
 	wire		[`LEN_WIDTH								- 1	:	0]	len_out;
-	wire																				valid_in, valid_in_;
+	wire																				valid_cpr_in, valid_cpr_in_, valid_cpr_out;
 	assign 	cpr_in 		= infifo_out;
 	Register #(
 		.BIT_WIDTH(1)
-	) valid_reg (
+	) valid_reg0 (
 		clk, 
 		reset, 
 		wrt_en, 
-		valid_in, 
-		valid_in_
+		valid_cpr_in_, 
+		valid_cpr_in
 	);
-	assign	valid_in 	= (pop_infifo == 1'b1) ? 1'b1 : 1'b0;
+	assign	valid_cpr_in_ 	= (pop_infifo == 1'b1) ? 1'b1 : 1'b0;
   EightDataCompressUnit #(
   	.DATA_WIDTH	(`DATA_WIDTH),
   	.TAG_WIDTH	(`TAG_WIDTH	),
@@ -65,20 +66,32 @@ module Compressor (
   	clk, 
   	reset, 
   	wrt_en, 
-  	valid_in_,
+  	valid_cpr_in,
   	cpr_in, 
   	cpr_out, 
   	tag_out,
   	len_out,
-  	valid_out
+  	valid_cpr_out
   );
   
-  wire		push_cmpfifo, pop_cmpfifo, empty_cmpfifo, full_cmpfifo, almost_full_cmpfifo;
+  wire		push_cmpfifo, pop_cmpfifo, pop_cmpfifo_, empty_cmpfifo, full_cmpfifo, almost_full_cmpfifo;
 	wire 		[`MEM_ADDR_WIDTH 																						: 0] 	cmpfifo_count;
 	wire 		[(`DATA_WIDTH + `TAG_WIDTH) * `NUM_DATA + `LEN_WIDTH	- 1 	:	0] 	cmpfifo_in, cmpfifo_out;
-	assign 	push_cmpfifo 	= (almost_full_cmpfifo == 1'b0 && valid_out == 1'b1) ? 1'b1 : 1'b0;
-	assign 	pop_cmpfifo		= (empty_cmpfifo == 1'b0 && stall == 1'b0) ? 1'b1 : 1'b0;
-	assign 	cmpfifo_in 		= {cpr_out, tag_out, len_out};
+
+	Register #(
+		.BIT_WIDTH(1)
+	) pop_reg1 (
+		clk, 
+		reset, 
+		wrt_en, 
+		pop_cmpfifo_, 
+		pop_cmpfifo
+	);
+	
+	assign 	push_cmpfifo 	= (almost_full_cmpfifo == 1'b0 && valid_cpr_out == 1'b1) ? 1'b1 : 1'b0;
+	assign 	pop_cmpfifo_ 	= (empty_cmpfifo == 1'b0 && stall == 1'b0) ? 1'b1 : 1'b0;
+	assign 	cmpfifo_in 		= (push_cmpfifo == 1'b1) ? {cpr_out, tag_out, len_out} : 0;
+	
   FIFO #(
   	.DATA_WIDTH ((`DATA_WIDTH + `TAG_WIDTH) * `NUM_DATA + `LEN_WIDTH),	 
   	.ADDR_WIDTH (`MEM_ADDR_WIDTH)
@@ -95,11 +108,20 @@ module Compressor (
   	cmpfifo_count
   );
 
-  wire		valid, stall, aligner_wrt_en;
+  wire																																			valid, stall, valid_ali_in_, valid_ali_in;
   wire 		[(`DATA_WIDTH + `TAG_WIDTH) * `NUM_DATA + `LEN_WIDTH	- 1 	:	0]	aligner_in;
   wire		[`DATA_WIDTH * `NUM_DATA 															-	1		:	0]	aligner_out;
-  assign 	aligner_in = cmpfifo_out;
-  assign 	aligner_wrt_en = (pop_cmpfifo == 1'b1) ? 1'b1 : 1'b0;
+	Register #(
+		.BIT_WIDTH(1)
+	) valid_reg1 (
+		clk, 
+		reset, 
+		wrt_en, 
+		valid_ali_in_, 
+		valid_ali_in
+	);
+	assign 	valid_ali_in_ = (pop_cmpfifo == 1'b1) ? 1'b1 : 1'b0;
+  assign 	aligner_in 		= (valid_ali_in == 1'b1) ? cmpfifo_out : 0;
   Aligner #(
   	.DATA_IN_WIDTH 	((`DATA_WIDTH + `TAG_WIDTH) * `NUM_DATA),
 		.LEN_WIDTH 			(`LEN_WIDTH),
@@ -107,7 +129,7 @@ module Compressor (
   )	al0 (
   	clk, 
   	reset, 
-  	aligner_wrt_en, 
+  	wrt_en, 
   	aligner_in [(`DATA_WIDTH + `TAG_WIDTH) * `NUM_DATA + `LEN_WIDTH		- 1	:	 `LEN_WIDTH], // tag + cpr_data
   	aligner_in [`LEN_WIDTH																						- 1	:						0], // len 
   	aligner_out, 
