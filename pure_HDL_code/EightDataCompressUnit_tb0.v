@@ -5,12 +5,14 @@ module EightDataCompressUnit_tb;
 	reg 										clk;
 	reg											reset;
 	reg 										wrtEn; 
+	reg 										validIn; 
 	reg 	[32 * 8 - 1 : 0]	dataIn;
 	reg 	[32 * 8 - 1 : 0]	cprDataIn;	// debug
 	reg		[2  * 8 - 1 : 0]  tagIn;		// debug
 	wire  [32 * 8 - 1 : 0]  dataOut;
 	wire	[2  * 8 - 1 : 0]  tagOut;
 	wire  [7          : 0]  lenOut;
+	wire										validOut;
 	
 	initial 
 	begin
@@ -18,11 +20,13 @@ module EightDataCompressUnit_tb;
 		clk = 0;
 		reset = 0;
 		wrtEn = 1;
+		validIn = 0;
 		@(negedge clk);
 		
 		// len = F
 		cprDataIn = 256'hFEDC_BA98_0000_7654_0000_0032_1FED_CBA9_0000_8765_0000_0043_0000_0000_0000_0021;
 		tagIn		= 16'b1110011110010001;
+		validIn = 1;
 		@(negedge clk);
 		// len = B
 // 		cprDataIn = 256'h0000_0000_0000_0076_0000_5432_0000_001F_0000_00ED_0000_CBA9_0000_8765_0000_4321;
@@ -55,12 +59,14 @@ module EightDataCompressUnit_tb;
   	clk, 
   	reset, 
   	wrtEn, 
+  	validIn,
   	dataIn, 
   	cprDataIn, 
   	tagIn, 
   	dataOut, 
   	tagOut, 
-  	lenOut
+  	lenOut,
+  	validOut
   );
   
   always #1 clk = ~clk;

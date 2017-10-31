@@ -1,9 +1,11 @@
+FIFO.v
 trans.v
 compress_unit.v
 Register.v
 Shifter.v
 Merger.v
 Tag2Len.v
+Aligner.v
 EightDataCompressUnit.v
 Compressor.v
 Compressor_tb.v

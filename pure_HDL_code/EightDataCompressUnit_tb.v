@@ -5,18 +5,23 @@ module EightDataCompressUnit_tb;
 	reg 										clk;
 	reg											reset;
 	reg 										wrtEn; 
+	reg 										validIn; 
 	reg 	[32 * 8 - 1 : 0]	dataIn;
 	wire  [32 * 8 - 1 : 0]  dataOut;
 	wire	[2  * 8 - 1 : 0]  tagOut;
-	wire  [7          : 0]  lenOut; 
+	wire  [7          : 0]  lenOut;
+	wire 										validOut;  
 	
 	initial 
 	begin
 		
 		clk = 0;
-		reset = 0;
+		reset = 1;
 		wrtEn = 1;
+		validIn = 0;
 		@(negedge clk);
+		reset = 0;
+		validIn = 1;
 // 		dataIn = 256'hFEDC_BA98_0000_7654_0000_0032_1FED_CBA9_0000_8765_0000_0043_0000_0000_0000_0021;
 		dataIn = 256'hFEDC_BA98_FEDC_BA98_FEDC_BA98_FEDC_BA98_FEDC_BA98_FEDC_BA98_FEDC_BA98_FEDC_BA98;
 		$display("dataOut %h", dataOut);
@@ -45,10 +50,12 @@ module EightDataCompressUnit_tb;
   	clk, 
   	reset, 
   	wrtEn, 
+  	validIn,
   	dataIn, 
   	dataOut, 
   	tagOut, 
-  	lenOut
+  	lenOut,
+  	validOut
   );
   
   always #1 clk = ~clk;
