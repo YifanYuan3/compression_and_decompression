@@ -8,5 +8,6 @@ Tag2Len.v
 Aligner.v
 EightDataCompressUnit.v
 Compressor.v
+CompressorController.v
 Compressor_tb.v
 

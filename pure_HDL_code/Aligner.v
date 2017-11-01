@@ -9,34 +9,37 @@ module Aligner #(
 	input 															wrt_en,
 	input 		[DATA_IN_WIDTH 	- 1	: 0] 	data_in,
 	input 		[LEN_WIDTH  		- 1	: 0] 	len,
+	input			[2									:	0]  flags_in,		// tlast_in, flag_compression, is_header
 	output		[DATA_OUT_WIDTH - 1 : 0] 	data_out,
-	output															valid,
-	output															stall
+	output		[2									:	0]	flags_out 	// valid, stall, tlast_out
 );
-	wire																valid;
-	wire																stall;
-// 	wire																stall_in;
-// 	wire																stall_out;
+	wire																valid, stall, tlast_in, flag_compression, is_header, tlast_out, tlast_out_; 		// todo: link tlast_out
 	wire 			[LEN_WIDTH  				: 0]  in_data_len;
 	wire 			[LEN_WIDTH  		+ 1	: 0]  merged_len;
 	wire 			[LEN_WIDTH  				: 0] 	remained_len_in;
 	wire			[LEN_WIDTH  		    : 0] 	remained_len_out;
 
+	assign tlast_in 					= flags_in[2];
+	assign flag_compression		= flags_in[1];
+	assign is_header					= flags_in[0];
+	
 	assign in_data_len 				= len << 3;
-	assign merged_len   			= remained_len_out + in_data_len;
+	assign merged_len   			= (flag_compression == 1'b0 || is_header == 1'b1) ? 256 : remained_len_out + in_data_len;
 	assign remained_len_in   	= valid_in ? merged_len - 256 : merged_len;
 	assign valid_in 					= (merged_len >= 256) ? 1'b1 : 1'b0;
-	assign valid 							= valid_in;
+	assign valid 							= valid_in | tlast_out;
 	assign stall							= merged_len >= 512 ? 1'b1 : 1'b0;
+	assign tlast_out_					= tlast_in;
+	assign flags_out					= {valid, stall, tlast_out};
 	
 	Register #(
-		.BIT_WIDTH(1)
+		.BIT_WIDTH(2)
 	) valid_reg (
 		clk, 
 		reset, 
 		wrt_en, 
-		valid_in, 
-		valid_out
+		{valid_in, 	tlast_out_}, 
+		{valid_out, tlast_out}
 	);
 	
 	Register #(
