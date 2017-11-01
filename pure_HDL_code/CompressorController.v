@@ -20,58 +20,62 @@ module CompressorController (
 	reg			[2								:	0]	state;		
 	reg			[2								:	0]	next_state;	
 	reg															flag_compression;
+	reg															flag_compression_delay;	
 	reg															is_header;
 	
 	always @*
 	begin
 		next_state = state;
-		//todo maybe I need to initialize flag_compression here? 
+		flag_compression = flag_compression_delay;
+		is_header = 1'b0;
 		case (state)
 			IDLE: begin
-				if (tvalid && tready)
+				if (tvalid && tready) begin
 					next_state 				= H0;
-					flag_compression 	= 1'b0;
-					is_header 				= 1'b1;
+					flag_compression 	= (tvalid == 1) && (data_in[111:96] == 16'h0008) && (data_in[191:184] == 8'h06) && (data_in[143:128] == 16'hdc05) && (data_in[127:120] == 8'h28);
+					is_header					= 1'b1;
+				end
 			end
 			H0: begin
-				if (tvalid && tready)
+				if (tvalid && tready) begin
 					next_state 				= H1;			
-					flag_compression 	= (tvalid == 1) && (data_in[111:96] == 16'h0008) && (data_in[191:184] == 8'h06) && (data_in[143:128] == 16'hdc05) && (data_in[127:120] == 8'h28);
-					is_header					=	1'b1;
+					is_header					= 1'b1;
+				end
 			end 
 			H1: begin
-				if (tvalid && tready)
-					next_state = H2;
-					flag_compression = flag_compression;
-					is_header					=	1'b1;
+				if (tvalid && tready) begin
+					next_state 				= H2;
+					is_header					= 1'b1;
+				end
 			end
 			H2: begin
-				if (tvalid && tready)
-					next_state = H3;
-					flag_compression = flag_compression;
-					is_header					=	1'b1;
+				if (tvalid && tready) begin 
+					next_state 				= H3;
+					is_header					= 1'b1;
+				end
 			end
 			H3: begin
-				if (tvalid && tready)
-					next_state = DATA;
-					flag_compression = flag_compression;
-					is_header					=	1'b0;
+				if (tvalid && tready) 
+					next_state 				= DATA;
 			end
 			DATA: begin
-				if (tlast && tvalid && tready)
-					next_state = IDLE;
-					flag_compression = flag_compression;
-					is_header					=	1'b0;
+				if (tlast && tvalid && tready) begin
+					next_state 				= IDLE;
+				end
 			end
 		endcase
 	end
 	
 	always @(posedge clk)
   begin
-    if (reset)
+    if (reset) begin
       state <= IDLE;
-    else
+      flag_compression_delay <= 1'b0;
+    end
+    else begin
       state <= next_state;
+      flag_compression_delay <= flag_compression;
+    end
   end
 	
 	assign	tready 			= !full_infifo;

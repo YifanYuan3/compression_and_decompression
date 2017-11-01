@@ -39,11 +39,12 @@ module Compressor (
 
 	wire 		[`DATA_WIDTH * `NUM_DATA + 3 - 1 	: 0] 	infifo_in, infifo_out;		// tlast_in, flag_compression, is_header
 	wire 		[`MEM_ADDR_WIDTH 									: 0] 	infifo_count;
+	wire																						valid_cpr_in, valid_cpr_out;
 	
 	assign 	infifo_in		=	{data_in, tlast_in, flag_compression, is_header};
 	assign	tready_out	=	!full_infifo;
 	FIFO #(
-  	.DATA_WIDTH (`DATA_WIDTH * `NUM_DATA + 3),	 
+  	.DATA_WIDTH ((`DATA_WIDTH * `NUM_DATA) + 3),	 
   	.ADDR_WIDTH (`MEM_ADDR_WIDTH)
   ) infifo (
   	clk,
@@ -57,26 +58,26 @@ module Compressor (
   	almost_full_infifo,
   	infifo_count
   );
-	
-	wire 		[`DATA_WIDTH * `NUM_DATA - 1 : 0] cpr_in, cpr_out;
-	wire		[`TAG_WIDTH  * `NUM_DATA - 1 : 0]	tag_out;
-	wire		[`LEN_WIDTH							 - 1 : 0]	len_out;
-	wire																			valid_cpr_in;
-	wire		[3													 : 0]	flags_from_infifo, flags_from_infifo_;
-	wire		[3													 : 0]	flags_from_eight;
-	
-	assign 	cpr_in 							= infifo_out[`DATA_WIDTH * `NUM_DATA + 3 - 1 	: 3];
-	assign	valid_cpr_in	 			= (pop_infifo == 1'b1) ? 1'b1 : 1'b0;
-	assign  flags_from_infifo_	= {valid_cpr_in, infifo_out	[2:0]}; 
+
+	assign	valid_cpr_in	 			= pop_infifo;
 	Register #(
-		.BIT_WIDTH(4)
+		.BIT_WIDTH(1)
 	) valid_reg0 (
 		clk, 
 		reset, 
 		wrt_en, 
-		flags_from_infifo_, 
-		flags_from_infifo
+		valid_cpr_in, 
+		valid_cpr_out
 	);
+
+	wire		[3													 : 0]	flags_from_infifo;
+	wire		[3													 : 0]	flags_from_eight;
+	wire 		[`DATA_WIDTH * `NUM_DATA - 1 : 0] cpr_in, cpr_out;
+	wire		[`TAG_WIDTH  * `NUM_DATA - 1 : 0]	tag_out;
+	wire		[`LEN_WIDTH							 - 1 : 0]	len_out;
+
+	assign  flags_from_infifo		= {valid_cpr_out, infifo_out [2:0]}; 	
+	assign 	cpr_in 							= infifo_out[`DATA_WIDTH * `NUM_DATA + 3 - 1 	: 3];
 
   EightDataCompressUnit #(
   	.DATA_WIDTH	(`DATA_WIDTH),
@@ -135,7 +136,7 @@ module Compressor (
 	assign 	valid_ali_in_	 			= (pop_cmpfifo == 1'b1) ? 1'b1 : 1'b0;
 	assign	valid_ali_in				=	flags_from_cmpfifo[3];
   assign 	aligner_in 					= (valid_ali_in == 1'b1) ? cmpfifo_out[(`DATA_WIDTH + `TAG_WIDTH) * `NUM_DATA + `LEN_WIDTH + 3 - 1	: 3] : 0;
-	assign 	flags_from_cmpfifo_ = {valid_ali_in_, flags_from_eight[2:0]};
+	assign 	flags_from_cmpfifo_ = {valid_ali_in_, cmpfifo_out[2:0]};
   Aligner #(
   	.DATA_IN_WIDTH 	((`DATA_WIDTH + `TAG_WIDTH) * `NUM_DATA),
 		.LEN_WIDTH 			(`LEN_WIDTH),
@@ -146,7 +147,7 @@ module Compressor (
   	wrt_en, 
   	aligner_in [(`DATA_WIDTH + `TAG_WIDTH) * `NUM_DATA + `LEN_WIDTH		- 1	:	 `LEN_WIDTH], // {cpr_data, tag}
   	aligner_in [`LEN_WIDTH																						- 1	:						0], // len 
-  	flags_from_cmpfifo [2:0],
+  	flags_from_cmpfifo,
   	aligner_out, 
   	flags_from_aligner // valid_aligner[2], stall[1], tlast_out[0]
   );
