@@ -9,19 +9,19 @@ module CompressorController (
 	input														full_infifo,
 	input														empty_infifo,
 	input 	[`BURST_WIDTH -	1	:	0]	data_in,
-	output	[2								:	0] 	state,
+	output	reg [2								:	0] 	state,
 	output													push_infifo,
 	output													pop_infifo,
-	output													flag_compression,
-	output													is_header
+	output					reg								flag_compression,
+	output					reg								is_header
 );
 	localparam integer IDLE = 0, H0 = 1, H1 = 2, H2 = 3, H3 = 4, DATA = 5;
 
-	reg			[2								:	0]	state;		
+	
 	reg			[2								:	0]	next_state;	
-	reg															flag_compression;
+
 	reg															flag_compression_delay;	
-	reg															is_header;
+
 	
 	always @*
 	begin
