@@ -7,10 +7,10 @@ module Register #(
 	input			  												reset,
 	input																wrtEn,
 	input				[BIT_WIDTH - 1: 0] 			dataIn,
-	output			[BIT_WIDTH - 1: 0] 			dataOut
+	output		reg	[BIT_WIDTH - 1: 0] 			dataOut
 );
 
-	reg					[BIT_WIDTH - 1: 0] 			dataOut;
+
 	
 	always @(posedge clk) begin
 		if (reset == 1'b1)

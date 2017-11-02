@@ -4,9 +4,9 @@ module Tag2Len #(
 )
 (
 	input  		[TAG_WIDTH - 1 : 0]	tag,
-	output 		[LEN_WIDTH - 1 : 0]	len
+	output 	reg	[LEN_WIDTH - 1 : 0]	len
 );
-	reg 			[LEN_WIDTH - 1 : 0]	len;
+
 
 	always @ (tag)
 	case (tag)
