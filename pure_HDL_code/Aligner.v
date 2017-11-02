@@ -14,7 +14,7 @@ module Aligner #(
 	output		[DATA_OUT_WIDTH - 1 : 0] 	data_out,
 	output		[2									:	0]	flags_out 	// valid, stall, tlast_out
 );
-	wire																valid, stall, tlast_in, flag_compression, is_header, tlast_out; 		
+	wire																valid, stall, tlast_in, tlast_in_, flag_compression, is_header, tlast_out, tlast_out_; 		
 	wire 			[LEN_WIDTH  				: 0]  in_data_len;
 	wire 			[LEN_WIDTH  		+ 1	: 0]  merged_len;
 	wire 			[LEN_WIDTH  				: 0] 	remained_len_in;
@@ -31,6 +31,9 @@ module Aligner #(
 	assign filled 						= (merged_len >= 256) ? 1'b1 : 1'b0;
 	assign valid 							= valid_align & (filled | tlast_out);
 	assign stall							= merged_len >= 512 ? 1'b1 : 1'b0;
+
+	assign tlast_in_					= (filled == 1'b1) & (tlast_in == 1'b1) ? 1'b1 : 1'b0;
+	assign tlast_out					= (filled == 1'b0) & (tlast_in == 1'b1) ? 1'b1 : tlast_out_;
 	assign flags_out					= {valid, stall, tlast_out};
 	
 	Register #(
@@ -39,8 +42,8 @@ module Aligner #(
 		clk, 
 		reset, 
 		wrt_en, 
-		{filled, 	tlast_in}, 
-		{valid_out, tlast_out}
+		{filled, 	tlast_in_}, 
+		{valid_out, tlast_out_}
 	);
 	
 	Register #(

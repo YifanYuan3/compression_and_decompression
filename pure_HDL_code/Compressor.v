@@ -120,23 +120,22 @@ module Compressor (
   );
 
   wire																																			valid_aligner, stall, valid_ali_in, valid_ali_in_;
-	wire		[3													 																: 0]	flags_from_cmpfifo, flags_from_cmpfifo_;
+	wire		[3													 																: 0]	flags_from_cmpfifo;
 	wire		[2																													:	0]	flags_from_aligner;
   wire 		[(`DATA_WIDTH + `TAG_WIDTH) * `NUM_DATA + `LEN_WIDTH	- 1 	:	0]	aligner_in;
   wire		[`DATA_WIDTH * `NUM_DATA 															-	1		:	0]	aligner_out;
 	Register #(
-		.BIT_WIDTH(4)
+		.BIT_WIDTH(1)
 	) valid_reg1 (
 		clk, 
 		reset, 
 		wrt_en, 
-		flags_from_cmpfifo_, 
-		flags_from_cmpfifo
+		valid_ali_in_, 
+		valid_ali_in
 	);
 	assign 	valid_ali_in_	 			= (pop_cmpfifo == 1'b1) ? 1'b1 : 1'b0;
-	assign	valid_ali_in				=	flags_from_cmpfifo[3];
   assign 	aligner_in 					= (valid_ali_in == 1'b1) ? cmpfifo_out[(`DATA_WIDTH + `TAG_WIDTH) * `NUM_DATA + `LEN_WIDTH + 3 - 1	: 3] : 0;
-	assign 	flags_from_cmpfifo_ = {valid_ali_in_, cmpfifo_out[2:0]};
+	assign 	flags_from_cmpfifo = {valid_ali_in, cmpfifo_out[2:0]};
   Aligner #(
   	.DATA_IN_WIDTH 	((`DATA_WIDTH + `TAG_WIDTH) * `NUM_DATA),
 		.LEN_WIDTH 			(`LEN_WIDTH),
