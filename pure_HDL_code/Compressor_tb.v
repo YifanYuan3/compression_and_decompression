@@ -21,7 +21,8 @@ module Compressor_tb;
 	wire										tready_out;
 	wire										tvalid_out;
 	wire										tlast_out;
-	
+	wire	[32     - 1 : 0]	tkeep;
+		
 	initial 
 	begin
 		
@@ -185,7 +186,7 @@ module Compressor_tb;
 		$finish;
 	end
   
-  Compressor cmprs (clk, reset, wrtEn, data_in, tvalid_in, tlast_in, tready_in, data_out, tready_out, tvalid_out, tlast_out);
+  Compressor cmprs (clk, reset, wrtEn, data_in, tvalid_in, tlast_in, tready_in, data_out, tready_out, tvalid_out, tlast_out, tkeep);
   
   always #1 clk = ~clk;
   

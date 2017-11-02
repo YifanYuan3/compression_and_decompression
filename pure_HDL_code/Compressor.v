@@ -15,7 +15,8 @@ module Compressor (
 	output	[`DATA_WIDTH * `NUM_DATA - 1 	: 0]	data_out,
 	output																			tready_out,			// incoming data: not full of infifo
 	output																			tvalid_out,			// outgoing data: not empty at outfifo
-	output																			tlast_out				// outgoing data: aligner should generate this signal
+	output																			tlast_out,			// outgoing data: aligner should generate this signal
+	output	[`DATA_WIDTH 						 - 1	:	0]	tkeep
 );
 	
 	wire	[2 : 0]	state;
@@ -174,6 +175,17 @@ module Compressor (
   	outfifo_count
   );
   
-  assign	tvalid_out	=	!empty_outfifo;
+  wire	tvalid_out_		= !empty_outfifo;
+	Register #(
+		.BIT_WIDTH(1)
+	) tvalid_out_reg (
+		clk, 
+		reset, 
+		wrt_en, 
+		tvalid_out_, 
+		tvalid_out
+	);
+	
+	assign tkeep = 32'hFFFF;
 
 endmodule
