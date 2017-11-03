@@ -36,7 +36,7 @@ module Aligner #(
 
 	assign tlast_in_					= (overflow == 1'b1) & (tlast_in == 1'b1) ? 1'b1 : 1'b0;
 	assign tlast_out					= (overflow == 1'b0) & (tlast_in == 1'b1) ? 1'b1 : tlast_out_;
-	assign tkeep							= (filled == 1'b0) & (tlast_in == 1'b1) ? merged_len : 32'hFFFF;
+	assign tkeep							= (filled == 1'b0) & (tlast_in == 1'b1) ? 32'hFFFFFFFF >> ((256 - merged_len) >> 3) : 32'hFFFFFFFF;
 	assign flags_out					= {valid, stall, tlast_out};
 	
 	Register #(

@@ -29,8 +29,8 @@ module CompressorController (
 			IDLE: begin
 				if (tvalid && tready) begin
 					if (data_in[191:184] == 8'h06) begin
-						next_state 				= H0;
-						flag_compression 	= (tvalid == 1) && (data_in[111:96] == 16'h0008) && (data_in[191:184] == 8'h06) && (data_in[143:128] == 16'hdc05) && (data_in[127:120] == 8'h28);
+						next_state 					= H0;
+						flag_compression 		= (tvalid == 1) && (data_in[111:96] == 16'h0008) && (data_in[191:184] == 8'h06) && (data_in[143:128] == 16'hdc05) && (data_in[127:120] == 8'h28);
 						is_header						= 1'b1;
 					end
 					else begin

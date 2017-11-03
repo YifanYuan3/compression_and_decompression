@@ -1,17 +1,17 @@
 `timescale 1ns/1ns
-// 	input														clk,
-// 	input														reset,
-// 	input 													wrt_en,
-// 	input 													tvalid,
-// 	input														tlast,
-// 	input														full_infifo,
-// 	input														empty_infifo,
-// 	input 	[`BURST_WIDTH -	1	:	0]	data_in,
-// 	output	[2								:	0] 	state,
-// 	output													push_infifo,
-// 	output													pop_infifo,
-// 	output													flag_compression,
-// 	output													is_header
+// 	input																clk,
+// 	input																reset,
+// 	input 															wrt_en,
+// 	input 															tvalid,
+// 	input																tlast,
+// 	input																full_infifo,
+// 	input																empty_infifo,
+// 	input 	[`BURST_WIDTH -	1			:	0]	data_in,
+// 	output	reg [2								:	0] 	state,
+// 	output															push_infifo,
+// 	output															pop_infifo,
+// 	output	reg													flag_compression,
+// 	output	reg													is_header
 
 module CompressorController_tb;
 	reg 					clk;
