@@ -5,20 +5,21 @@ module Aligner #(
 	parameter DATA_OUT_WIDTH 	= 256
 )
 (
-	input																clk,
-	input 															reset,
-	input 															wrt_en,
-	input 		[DATA_IN_WIDTH 	- 1	: 0] 	data_in,
-	input 		[LEN_WIDTH  		- 1	: 0] 	len,
-	input			[3									:	0]  flags_in,		// valid_align, tlast_in, flag_compression, is_header
-	output		[DATA_OUT_WIDTH - 1 : 0] 	data_out,
-	output		[2									:	0]	flags_out 	// valid, stall, tlast_out
+	input																		clk,
+	input 																	reset,
+	input 																	wrt_en,
+	input 		[DATA_IN_WIDTH 	- 1			: 0] 	data_in,
+	input 		[LEN_WIDTH  		- 1			: 0] 	len,
+	input			[3											:	0]  flags_in,		// valid_align, tlast_in, flag_compression, is_header
+	output		[DATA_OUT_WIDTH - 1 		: 0] 	data_out,
+	output		[2											:	0]	flags_out, 	// valid, stall, tlast_out
+	output		[DATA_OUT_WIDTH / 8 - 1 : 0]	tkeep
 );
-	wire																valid, stall, tlast_in, tlast_in_, flag_compression, is_header, tlast_out, tlast_out_; 		
-	wire 			[LEN_WIDTH  				: 0]  in_data_len;
-	wire 			[LEN_WIDTH  		+ 1	: 0]  merged_len;
-	wire 			[LEN_WIDTH  				: 0] 	remained_len_in;
-	wire			[LEN_WIDTH  		    : 0] 	remained_len_out;
+	wire																		valid, stall, tlast_in, tlast_in_, flag_compression, is_header, tlast_out, tlast_out_; 		
+	wire 			[LEN_WIDTH  						: 0]  in_data_len;
+	wire 			[LEN_WIDTH  				+ 1	: 0]  merged_len;
+	wire 			[LEN_WIDTH  						: 0] 	remained_len_in;
+	wire			[LEN_WIDTH  				    : 0] 	remained_len_out;
 
 	assign valid_align				= flags_in[3];
 	assign tlast_in 					= (valid_align == 1'b1) ? flags_in[2] : 0;
@@ -34,6 +35,7 @@ module Aligner #(
 
 	assign tlast_in_					= (filled == 1'b1) & (tlast_in == 1'b1) ? 1'b1 : 1'b0;
 	assign tlast_out					= (filled == 1'b0) & (tlast_in == 1'b1) ? 1'b1 : tlast_out_;
+	assign tkeep							= (filled == 1'b0) & (tlast_in == 1'b1) ? merged_len : 32'hFFFF;
 	assign flags_out					= {valid, stall, tlast_out};
 	
 	Register #(

@@ -13,7 +13,6 @@ module Compressor (
 	input																				tlast_in,				// incoming data
 	input																				tready_in,			// outgoing data
 	output	[`DATA_WIDTH * `NUM_DATA - 1 	: 0]	data_out,
-	output																			tready_out,			// incoming data: not full of infifo
 	output																			tvalid_out,			// outgoing data: not empty at outfifo
 	output																			tlast_out,			// outgoing data: aligner should generate this signal
 	output	[`DATA_WIDTH 						 - 1	:	0]	tkeep
@@ -149,16 +148,18 @@ module Compressor (
   	aligner_in [`LEN_WIDTH																						- 1	:						0], // len 
   	flags_from_cmpfifo,
   	aligner_out, 
-  	flags_from_aligner // valid_aligner[2], stall[1], tlast_out[0]
+  	flags_from_aligner, // valid_aligner[2], stall[1], tlast_out[0]
+  	tkeep
   );
   
-  wire		push_outfifo, pop_outfifo, empty_outfifo, full_outfifo, almost_full_outfifo, align_tlast;
+  wire		push_outfifo, pop_outfifo, empty_outfifo, full_outfifo, almost_full_outfifo, align_tlast, tlast_out_, tvalid_out_;
  	wire 		[`MEM_ADDR_WIDTH	: 0] 	outfifo_count;
  	assign  valid_aligner	=	flags_from_aligner[2];
  	assign 	stall					= flags_from_aligner[1];
  	assign	align_tlast		=	flags_from_aligner[0];
   assign 	push_outfifo 	= (full_outfifo == 1'b0 && valid_aligner == 1'b1) ? 1'b1 : 1'b0 ;	
-  assign 	pop_outfifo 	= (empty_outfifo == 1'b0) ? 1'b1 : 1'b0;
+  assign 	pop_outfifo 	= (empty_outfifo == 1'b0 &&  tready_in == 1'b1) ? 1'b1 : 1'b0;
+  assign 	tvalid_out_		=	pop_outfifo;
   FIFO #(
   	.DATA_WIDTH (`DATA_WIDTH * `NUM_DATA + 1),	 
   	.ADDR_WIDTH (`MEM_ADDR_WIDTH)
@@ -168,14 +169,13 @@ module Compressor (
   	push_outfifo,
   	pop_outfifo,
   	{aligner_out, align_tlast}, 
-  	{data_out, tlast_out},
+  	{data_out, tlast_out_},
   	empty_outfifo,
   	full_outfifo,
   	almost_full_outfifo,
   	outfifo_count
   );
   
-  wire	tvalid_out_		= !empty_outfifo;
 	Register #(
 		.BIT_WIDTH(1)
 	) tvalid_out_reg (
@@ -185,7 +185,7 @@ module Compressor (
 		tvalid_out_, 
 		tvalid_out
 	);
-	
-	assign tkeep = 32'hFFFF;
+
+	assign tlast_out 	= tlast_out_ & tvalid_out;
 
 endmodule
