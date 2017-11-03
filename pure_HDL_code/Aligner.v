@@ -30,11 +30,12 @@ module Aligner #(
 	assign merged_len   			= (flag_compression == 1'b0 || is_header == 1'b1) ? 256 : remained_len_out + in_data_len;
 	assign remained_len_in   	= filled ? merged_len - 256 : merged_len;
 	assign filled 						= (merged_len >= 256) ? 1'b1 : 1'b0;
+	assign overflow 					= (merged_len > 256) ? 1'b1 : 1'b0;
 	assign valid 							= valid_align & (filled | tlast_out);
 	assign stall							= merged_len >= 512 ? 1'b1 : 1'b0;
 
-	assign tlast_in_					= (filled == 1'b1) & (tlast_in == 1'b1) ? 1'b1 : 1'b0;
-	assign tlast_out					= (filled == 1'b0) & (tlast_in == 1'b1) ? 1'b1 : tlast_out_;
+	assign tlast_in_					= (overflow == 1'b1) & (tlast_in == 1'b1) ? 1'b1 : 1'b0;
+	assign tlast_out					= (overflow == 1'b0) & (tlast_in == 1'b1) ? 1'b1 : tlast_out_;
 	assign tkeep							= (filled == 1'b0) & (tlast_in == 1'b1) ? merged_len : 32'hFFFF;
 	assign flags_out					= {valid, stall, tlast_out};
 	

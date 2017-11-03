@@ -32,7 +32,7 @@ module EightDataCompressUnit #(
 	);
 	
 	wire		[DATA_WIDTH * `NUM_COMPRESS_UNITS - 1 : 0]	dataIn_;
-	assign	dataIn_ = (flags_in[0] == 1'b1) ? dataIn : ((dataIn << (DATA_WIDTH >> 1)) | half);
+	assign	dataIn_ = (flags_in[1] == 1'b0 || flags_in[0] == 1'b1) ? dataIn : ((dataIn << (DATA_WIDTH >> 1)) | half);
 	
 	generate 
 		for (i = 0; i < `NUM_COMPRESS_UNITS; i = i + 1)

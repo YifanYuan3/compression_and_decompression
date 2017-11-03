@@ -58,8 +58,13 @@ module CompressorController (
 				end
 			end
 			H3: begin
-				if (tvalid && tready) 
-					next_state 					= DATA;
+				if (tvalid && tready) begin
+					if (tlast) begin
+						next_state 				= IDLE;
+					end else begin
+						next_state 				= DATA;
+					end
+				end
 			end
 			DATA: begin
 				if (tlast && tvalid && tready) begin
