@@ -135,7 +135,7 @@ module Compressor (
 	);
 	assign 	valid_ali_in_	 			= (pop_cmpfifo == 1'b1) ? 1'b1 : 1'b0;
   assign 	aligner_in 					= (valid_ali_in == 1'b1) ? cmpfifo_out[(`DATA_WIDTH + `TAG_WIDTH) * `NUM_DATA + `LEN_WIDTH + 3 - 1	: 3] : 0;
-	assign 	flags_from_cmpfifo = {valid_ali_in, cmpfifo_out[2:0]};
+	assign 	flags_from_cmpfifo 	= {valid_ali_in, cmpfifo_out[2:0]};
   Aligner #(
   	.DATA_IN_WIDTH 	((`DATA_WIDTH + `TAG_WIDTH) * `NUM_DATA),
 		.LEN_WIDTH 			(`LEN_WIDTH),

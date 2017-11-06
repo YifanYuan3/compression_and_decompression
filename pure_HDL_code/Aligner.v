@@ -15,12 +15,16 @@ module Aligner #(
 	output		[2											:	0]	flags_out, 	// valid, stall, tlast_out
 	output		[DATA_OUT_WIDTH / 8 - 1 : 0]	tkeep
 );
-	wire																		valid, stall, tlast_in, tlast_in_, flag_compression, is_header, tlast_out, tlast_out_; 		
-	wire 			[LEN_WIDTH  						: 0]  in_data_len;
-	wire 			[LEN_WIDTH  				+ 1	: 0]  merged_len;
-	wire 			[LEN_WIDTH  						: 0] 	remained_len_in;
-	wire			[LEN_WIDTH  				    : 0] 	remained_len_out;
-
+	wire																				valid, stall, tlast_in, tlast_in_, flag_compression, is_header, tlast_out, tlast_out_; 		
+	wire 			[LEN_WIDTH  								: 0]  in_data_len;
+	wire 			[LEN_WIDTH  						+ 1	: 0]  merged_len;
+	wire 			[LEN_WIDTH  								: 0] 	remained_len_in;
+	wire			[LEN_WIDTH  				    		: 0] 	remained_len_out;
+	wire			[DATA_OUT_WIDTH * 2 + 8 - 1 : 0]	shifted_data_in;
+	wire			[DATA_OUT_WIDTH * 2 + 8 - 1 : 0]	remained_data;
+	wire			[DATA_OUT_WIDTH * 2 + 8 - 1 : 0]	new_out;
+	wire			[DATA_OUT_WIDTH * 2 + 8 - 1 : 0]	old_out;
+	
 	assign valid_align				= flags_in[3];
 	assign tlast_in 					= (valid_align == 1'b1) ? flags_in[2] : 0;
 	assign flag_compression		= (valid_align == 1'b1) ? flags_in[1] : 0;
@@ -58,11 +62,6 @@ module Aligner #(
 		remained_len_in, 
 		remained_len_out
 	);
-	
-	wire			[DATA_OUT_WIDTH * 2 + 8 - 1 : 0]	shifted_data_in;
-	wire			[DATA_OUT_WIDTH * 2 + 8 - 1 : 0]	remained_data;
-	wire			[DATA_OUT_WIDTH * 2 + 8 - 1 : 0]	new_out;
-	wire			[DATA_OUT_WIDTH * 2 + 8 - 1 : 0]	old_out;
 	
 	Register #(
 		.BIT_WIDTH(DATA_OUT_WIDTH * 2 + 8)

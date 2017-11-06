@@ -59,7 +59,7 @@ module compress_unit
     assign a = ( exp <= 111 ) ? 2'b00 : 2'b10;
     
     
-    assign dataout0 = { din[ 31 ] , sum[ 22 : 8 ] , 16'b0 } ;
+    assign dataout0 = {16'b0, din[ 31 ] , sum[ 22 : 8 ]} ;
     assign dataout1 = 32'b0;
     assign dataout2 = din;
     
