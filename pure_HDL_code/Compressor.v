@@ -7,19 +7,22 @@
 module Compressor (
 	input 																			clk,
 	input 																			reset, 
-	input 																			wrt_en,
 	input 	[`DATA_WIDTH * `NUM_DATA - 1 	: 0] 	data_in,
 	input 																			tvalid_in,			// incoming data
 	input																				tlast_in,				// incoming data
 	input																				tready_in,			// outgoing data
+	input		[`DATA_WIDTH 						 - 1	:	0]	tkeep_in,				// Not used
 	output	[`DATA_WIDTH * `NUM_DATA - 1 	: 0]	data_out,
 	output																			tvalid_out,			// outgoing data: not empty at outfifo
 	output																			tlast_out,			// outgoing data: aligner should generate this signal
-	output	[`DATA_WIDTH 						 - 1	:	0]	tkeep
+	output																			tready_out,			
+	output	[`DATA_WIDTH 						 - 1	:	0]	tkeep_out
 );
 	
 	wire	[2 : 0]	state;
-	wire					push_infifo, pop_infifo, empty_infifo, full_infifo, almost_full_infifo, tready, flag_compression, is_header;
+	wire					push_infifo, pop_infifo, empty_infifo, full_infifo, almost_full_infifo, tready, flag_compression, is_header, wrt_en;
+	
+	assign wrt_en = 1'b1;
 	
 	CompressorController cc (
 		clk,
@@ -149,7 +152,7 @@ module Compressor (
   	flags_from_cmpfifo,
   	aligner_out, 
   	flags_from_aligner, // valid_aligner[2], stall[1], tlast_out[0]
-  	tkeep
+  	tkeep_out
   );
   
   wire		push_outfifo, pop_outfifo, empty_outfifo, full_outfifo, almost_full_outfifo, align_tlast, tlast_out_, tvalid_out_;
@@ -165,7 +168,7 @@ module Compressor (
   	.ADDR_WIDTH (`MEM_ADDR_WIDTH)
   ) outfifo (
   	clk,
-  	reset,
+  	reset,	
   	push_outfifo,
   	pop_outfifo,
   	{aligner_out, align_tlast}, 
