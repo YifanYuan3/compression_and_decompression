@@ -37,7 +37,7 @@ compressor_16 c16(
 
 always@ (*) begin
     if (exponent < 112) begin
-        bitmap = 2'b00;
+        bitmap = 2'b00; 
         data_out = res_0;
     end
     else if (exponent < 120) begin
