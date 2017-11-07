@@ -16,11 +16,13 @@ module Compressor_tb;
 	reg											tvalid_in;
 	reg											tlast_in;
 	reg											tready_in;
+	reg		[32     - 1 : 0]	tkeep_in;
 	wire  [32 * 8 - 1 : 0]  data_out;
 	wire										tvalid_out;
 	wire										tlast_out;
-	wire	[32     - 1 : 0]	tkeep;
-		
+	wire										tready_out;
+	wire	[32     - 1 : 0]	tkeep_out;
+			
 	initial 
 	begin
 		
@@ -137,7 +139,7 @@ module Compressor_tb;
 		$finish;
 	end
   
-  Compressor cmprs (clk, reset, wrtEn, data_in, tvalid_in, tlast_in, tready_in, data_out, tvalid_out, tlast_out, tkeep);
+  Compressor cmprs (clk, reset, data_in, tvalid_in, tlast_in, tready_in, tkeep_in, data_out, tvalid_out, tlast_out, tready_out, tkeep_out);
   
   always #1 clk = ~clk;
   
