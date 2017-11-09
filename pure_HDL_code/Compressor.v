@@ -2,6 +2,7 @@
 `define NUM_DATA				8
 `define TAG_WIDTH				2
 `define LEN_WIDTH				8
+`define TKEEP_WIDTH			32
 `define MEM_ADDR_WIDTH 	8
 
 module Compressor (
@@ -40,14 +41,14 @@ module Compressor (
 		is_header
 	);
 
-	wire 		[`DATA_WIDTH * `NUM_DATA + 3 - 1 	: 0] 	infifo_in, infifo_out;		// tlast_in, flag_compression, is_header
-	wire 		[`MEM_ADDR_WIDTH 									: 0] 	infifo_count;
-	wire																						valid_cpr_in, valid_cpr_out;
+	wire 		[`DATA_WIDTH * `NUM_DATA + `TKEEP_WIDTH + 3 - 1 	: 0] 	infifo_in, infifo_out;		// tkeep_in, tlast_in, flag_compression, is_header
+	wire 		[`MEM_ADDR_WIDTH 																	: 0] 	infifo_count;
+	wire																														valid_cpr_in, valid_cpr_out;
 	
-	assign 	infifo_in		=	{data_in, tlast_in, flag_compression, is_header};
+	assign 	infifo_in		=	{data_in, tkeep_in, tlast_in, flag_compression, is_header};
 	assign	tready_out	=	!full_infifo;
 	FIFO #(
-  	.DATA_WIDTH ((`DATA_WIDTH * `NUM_DATA) + 3),	 
+  	.DATA_WIDTH ((`DATA_WIDTH * `NUM_DATA) + `TKEEP_WIDTH + 3),	 
   	.ADDR_WIDTH (`MEM_ADDR_WIDTH)
   ) infifo (
   	clk,
@@ -73,14 +74,14 @@ module Compressor (
 		valid_cpr_out
 	);
 
-	wire		[3													 : 0]	flags_from_infifo;
-	wire		[3													 : 0]	flags_from_eight;
+	wire		[`TKEEP_WIDTH + 4 - 1				 : 0]	flags_from_infifo;
+	wire		[`TKEEP_WIDTH + 4 - 1				 : 0]	flags_from_eight;
 	wire 		[`DATA_WIDTH * `NUM_DATA - 1 : 0] cpr_in, cpr_out;
 	wire		[`TAG_WIDTH  * `NUM_DATA - 1 : 0]	tag_out;
 	wire		[`LEN_WIDTH							 - 1 : 0]	len_out;
 
-	assign  flags_from_infifo		= {valid_cpr_out, infifo_out [2:0]}; 	
-	assign 	cpr_in 							= infifo_out[`DATA_WIDTH * `NUM_DATA + 3 - 1 	: 3];
+	assign  flags_from_infifo		= {valid_cpr_out, infifo_out [`TKEEP_WIDTH + 3 - 1 : 0]}; 	
+	assign 	cpr_in 							= infifo_out[`DATA_WIDTH * `NUM_DATA + `TKEEP_WIDTH + 3 - 1 	: `TKEEP_WIDTH + 3];
 
   EightDataCompressUnit #(
   	.DATA_WIDTH	(`DATA_WIDTH),
@@ -100,14 +101,14 @@ module Compressor (
   
   wire		push_cmpfifo, pop_cmpfifo, empty_cmpfifo, full_cmpfifo, almost_full_cmpfifo, valid_eight;
 	wire 		[`MEM_ADDR_WIDTH 																							: 0] 	cmpfifo_count;
-	wire 		[(`DATA_WIDTH + `TAG_WIDTH) * `NUM_DATA + `LEN_WIDTH + 3 - 1 	:	0] 	cmpfifo_in, cmpfifo_out;
+	wire 		[(`DATA_WIDTH + `TAG_WIDTH) * `NUM_DATA + `LEN_WIDTH + 32 + 3 - 1 	:	0] 	cmpfifo_in, cmpfifo_out;
 	assign 	valid_eight		= flags_from_eight[3];
 	assign 	push_cmpfifo 	= (almost_full_cmpfifo == 1'b0 && valid_eight == 1'b1) ? 1'b1 : 1'b0;
 	assign 	pop_cmpfifo 	= (empty_cmpfifo == 1'b0 && stall == 1'b0) ? 1'b1 : 1'b0;
-	assign 	cmpfifo_in 		= (push_cmpfifo == 1'b1) ? {cpr_out, tag_out, len_out, flags_from_eight[2:0]} : 0;
+	assign 	cmpfifo_in 		= (push_cmpfifo == 1'b1) ? {cpr_out, tag_out, len_out, flags_from_eight[35:4], flags_from_eight[2:0]} : 0;
 	
   FIFO #(
-  	.DATA_WIDTH ((`DATA_WIDTH + `TAG_WIDTH) * `NUM_DATA + `LEN_WIDTH + 3),	 
+  	.DATA_WIDTH ((`DATA_WIDTH + `TAG_WIDTH) * `NUM_DATA + `LEN_WIDTH + 32 + 3),	 
   	.ADDR_WIDTH (`MEM_ADDR_WIDTH)
   ) cmpfifo (
   	clk,

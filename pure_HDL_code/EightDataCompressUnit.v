@@ -1,24 +1,25 @@
 `define NUM_COMPRESS_UNITS 8
 
 module EightDataCompressUnit #(
-	parameter 																					DATA_WIDTH = 32,
-	parameter 																					TAG_WIDTH  = 2,
-	parameter																						LEN_WIDTH  = 8
+	parameter 																					DATA_WIDTH 	= 32,
+	parameter 																					TAG_WIDTH  	= 2,
+	parameter																						LEN_WIDTH  	= 8,
+	parameter																						TKEEP_WIDTH	= 32
 )
 (
 	input																								clk,
 	input																								reset,
 	input																								wrtEn,
-	input		[3																		:	0]	flags_in, // valid[3], tlast_in[2] + flag_compression[1] + is_header[0]
+	input		[TKEEP_WIDTH + 4 									- 1	:	0]	flags_in, // tkeep_in[35:4], valid[3], tlast_in[2] + flag_compression[1] + is_header[0] 
 	input		[DATA_WIDTH * `NUM_COMPRESS_UNITS - 1 : 0]	dataIn,
 	output	[DATA_WIDTH * `NUM_COMPRESS_UNITS - 1 : 0]	dataOut,
 	output	[TAG_WIDTH  * `NUM_COMPRESS_UNITS - 1 : 0]	tagOut,
 	output  [LEN_WIDTH                        - 1 : 0]  lenOut,
-	output	[3																		:	0]	flags_out
+	output	[TKEEP_WIDTH + 4 									- 1	:	0]	flags_out
 );
 	
 	genvar 	i;
-	wire		[3																		:	0]	flags0, flags1, flags2, flags3;
+	wire		[TKEEP_WIDTH + 4 									- 1	:	0]	flags0, flags1, flags2, flags3;
 	wire		[(DATA_WIDTH >> 1) - 1								:	0]	half;				
 	
 	Register #(
@@ -36,7 +37,7 @@ module EightDataCompressUnit #(
 	
 	// TODO registers for dataIn_, flags_in
 	Register #(
-		.BIT_WIDTH(DATA_WIDTH * `NUM_COMPRESS_UNITS + 4)
+		.BIT_WIDTH(DATA_WIDTH * `NUM_COMPRESS_UNITS + TKEEP_WIDTH + 4)
 	) in_reg	(
 		clk, 
 		reset, 
@@ -76,7 +77,7 @@ module EightDataCompressUnit #(
 			Register #(.BIT_WIDTH(LEN_WIDTH ))	lenReg 			(clk, reset, wrtEn, tmpLen, 		len);
 		end
 	endgenerate
-	Register #(.BIT_WIDTH(4)) flagsreg0	(clk, reset, wrtEn, flags0, flags1);
+	Register #(.BIT_WIDTH(TKEEP_WIDTH + 4)) flagsreg0	(clk, reset, wrtEn, flags0, flags1);
 		
 	wire 		[DATA_WIDTH * 2 - 1 : 0] 	mgOut00, mgOut01, mgOut02, mgOut03;
 	wire 		[TAG_WIDTH  * 2 - 1 : 0] 	mgTag00, mgTag01, mgTag02, mgTag03;
@@ -85,20 +86,20 @@ module EightDataCompressUnit #(
   Merger #(.DATA_WIDTH(DATA_WIDTH),	.TAG_WIDTH(TAG_WIDTH), .LEN_WIDTH(LEN_WIDTH)) mg02 (clk, reset, wrtEn, CU[5].cprData, CU[5].tag, CU[5].len,	CU[4].cprData, CU[4].tag, CU[4].len, mgOut02, mgTag02, mgLen02);
   Merger #(.DATA_WIDTH(DATA_WIDTH),	.TAG_WIDTH(TAG_WIDTH), .LEN_WIDTH(LEN_WIDTH)) mg01 (clk, reset, wrtEn, CU[3].cprData, CU[3].tag, CU[3].len,	CU[2].cprData, CU[2].tag, CU[2].len, mgOut01, mgTag01, mgLen01);
   Merger #(.DATA_WIDTH(DATA_WIDTH),	.TAG_WIDTH(TAG_WIDTH), .LEN_WIDTH(LEN_WIDTH)) mg00 (clk, reset, wrtEn, CU[1].cprData, CU[1].tag, CU[1].len,	CU[0].cprData, CU[0].tag, CU[0].len, mgOut00, mgTag00, mgLen00);
-	Register #(.BIT_WIDTH(4)) flagsreg1	(clk, reset, wrtEn, flags1, flags2);
+	Register #(.BIT_WIDTH(TKEEP_WIDTH + 4)) flagsreg1	(clk, reset, wrtEn, flags1, flags2);
   
 	wire		[DATA_WIDTH * 4 - 1 : 0] 	mgOut10, mgOut11;
 	wire 		[TAG_WIDTH  * 4 - 1 : 0] 	mgTag10, mgTag11;
 	wire 		[LEN_WIDTH      - 1 : 0] 	mgLen10, mgLen11;
 	Merger #(.DATA_WIDTH(DATA_WIDTH * 2), .TAG_WIDTH(TAG_WIDTH * 2), .LEN_WIDTH(LEN_WIDTH)) mg11 (clk, reset, wrtEn, mgOut03, mgTag03, mgLen03, mgOut02, mgTag02, mgLen02, mgOut11, mgTag11, mgLen11);
 	Merger #(.DATA_WIDTH(DATA_WIDTH * 2), .TAG_WIDTH(TAG_WIDTH * 2), .LEN_WIDTH(LEN_WIDTH)) mg10 (clk, reset, wrtEn, mgOut01, mgTag01, mgLen01, mgOut00, mgTag00, mgLen00,	mgOut10, mgTag10, mgLen10);
-	Register #(.BIT_WIDTH(4)) flagsreg2	(clk, reset, wrtEn, flags2, flags3);
+	Register #(.BIT_WIDTH(TKEEP_WIDTH + 4)) flagsreg2	(clk, reset, wrtEn, flags2, flags3);
 	 	
 	wire		[DATA_WIDTH * 8 - 1 : 0] 	mgOut20;
 	wire 		[TAG_WIDTH  * 8 - 1 : 0] 	mgTag20;
 	wire 		[LEN_WIDTH      - 1 : 0] 	mgLen20;	
 	Merger #(.DATA_WIDTH(DATA_WIDTH * 4), .TAG_WIDTH(TAG_WIDTH * 4), .LEN_WIDTH(LEN_WIDTH)) mg20 (clk, reset, wrtEn, mgOut11, mgTag11, mgLen11, mgOut10, mgTag10, mgLen10,	mgOut20, mgTag20, mgLen20);
-	Register #(.BIT_WIDTH(4)) flagsreg3	(clk, reset, wrtEn, flags3, flags_out);
+	Register #(.BIT_WIDTH(TKEEP_WIDTH + 4)) flagsreg3	(clk, reset, wrtEn, flags3, flags_out);
 		
 	wire															valid, flag_compression, is_header;
 	wire 		[LEN_WIDTH      - 1 : 0] 	mgLen20_;
