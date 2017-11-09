@@ -1,0 +1,12 @@
+../FIFO.v
+../compress_unit.v
+../Register.v
+../Shifter.v
+../Merger.v
+../Tag2Len.v
+../Aligner.v
+../EightDataCompressUnit.v
+../Compressor.v
+../CompressorController.v
+../testbench/Compressor_tb.v
+

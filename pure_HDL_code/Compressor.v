@@ -11,7 +11,7 @@ module Compressor (
 	input 																			tvalid_in,			// incoming data
 	input																				tlast_in,				// incoming data
 	input																				tready_in,			// outgoing data
-	input		[`DATA_WIDTH 						 - 1	:	0]	tkeep_in,				// Not used
+	input		[`DATA_WIDTH 						 - 1	:	0]	tkeep_in,				
 	output	[`DATA_WIDTH * `NUM_DATA - 1 	: 0]	data_out,
 	output																			tvalid_out,			// outgoing data: not empty at outfifo
 	output																			tlast_out,			// outgoing data: aligner should generate this signal
