@@ -101,7 +101,7 @@ module Aligner #(
 
 	assign shifted_data_in 	= prev_data_in << prev_remained_len_out;
 	assign remained_data 		= (prev_valid_out == 1'b1) ? old_out >> DATA_OUT_WIDTH : (old_out << DATA_OUT_WIDTH + 8) >> (DATA_OUT_WIDTH + 8);
-	assign new_out 					= shifted_data_in | remained_data;
+	assign new_out 					= ((prev_flag_compression == 1'b0) || (prev_is_header == 1'b1)) ? 0 : shifted_data_in | remained_data;
 	assign data_out 				= ((prev_flag_compression == 1'b0) || (prev_is_header == 1'b1)) ? prev_data_in >> TAG_WIDTH : new_out[DATA_OUT_WIDTH - 1 : 0];
 
 endmodule

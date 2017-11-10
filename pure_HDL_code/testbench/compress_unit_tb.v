@@ -2,28 +2,18 @@ module CompressUnitTB;
 
   reg  [31:0] data_in;
   wire [31:0] data_out;
-  wire [1:0] status;
-  
-  reg clk;
-  reg reset;
-  reg enable;
+  wire [1:0] bitmap;
 
   integer i;
   initial begin
-    clk = 0;
-    reset = 0;
-    enable = 1;
-	  data_in = 2;
-	  @(negedge clk);
-	  data_in = 101;
-	  @(negedge clk);	  
-	  data_in = 1001;
+	  data_in = 32'h01bea23f;
+	  #3;
     $finish;
   end
+  
+//   always #1 clk = ~clk;
 
-  always #1 clk = ~clk;
-
-	compress_unit cu (clk, resetn, enable, data_in, data_out, status);
+	compress_unit cu (data_in, bitmap, data_out);
 
   initial
   begin

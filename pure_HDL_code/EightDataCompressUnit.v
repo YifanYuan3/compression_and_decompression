@@ -58,7 +58,6 @@ module EightDataCompressUnit #(
 				dataIn__ [DATA_WIDTH * (i + 1) - 1 : DATA_WIDTH * i], 
 				tmpTag_,
 				tmpCprData_ 
-				
 			);
 			
 			assign tmpCprData = (flags0[1] == 1'b0 || flags0[0] == 1'b1) ? dataIn__ [DATA_WIDTH * (i + 1) - 1 : DATA_WIDTH * i] : tmpCprData_;
