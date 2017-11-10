@@ -10,7 +10,7 @@ module EightDataCompressUnit #(
 	input																								clk,
 	input																								reset,
 	input																								wrtEn,
-	input		[TKEEP_WIDTH + 4 									- 1	:	0]	flags_in, // tkeep_in[35:4], valid[3], tlast_in[2] + flag_compression[1] + is_header[0] 
+	input		[TKEEP_WIDTH + 4 									- 1	:	0]	flags_in, // valid[35], tkeep_in[34:3], tlast_in[2] + flag_compression[1] + is_header[0] 
 	input		[DATA_WIDTH * `NUM_COMPRESS_UNITS - 1 : 0]	dataIn,
 	output	[DATA_WIDTH * `NUM_COMPRESS_UNITS - 1 : 0]	dataOut,
 	output	[TAG_WIDTH  * `NUM_COMPRESS_UNITS - 1 : 0]	tagOut,
@@ -104,7 +104,7 @@ module EightDataCompressUnit #(
 	wire															valid, flag_compression, is_header;
 	wire 		[LEN_WIDTH      - 1 : 0] 	mgLen20_;
 
-	assign 	valid							= flags_out[3];
+	assign 	valid							= flags_out[TKEEP_WIDTH + 4 - 1];
 	assign	flag_compression	=	flags_out[1];
 	assign	is_header					= flags_out[0];
 	
