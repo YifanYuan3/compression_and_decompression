@@ -22,6 +22,25 @@ module Compressor (
 	
 	wire	[2 : 0]	state;
 	wire					push_infifo, pop_infifo, empty_infifo, full_infifo, almost_full_infifo, tready, flag_compression, is_header, wrt_en;
+	wire 		[`DATA_WIDTH * `NUM_DATA + `TKEEP_WIDTH + 3 - 1 	: 0] 	infifo_in, infifo_out;		// tkeep_in, tlast_in, flag_compression, is_header
+	wire 		[`MEM_ADDR_WIDTH 																	: 0] 	infifo_count;
+	wire																														valid_cpr_in, valid_cpr_out;
+	wire		[`TKEEP_WIDTH + 4 - 1				 : 0]	flags_from_infifo;	// valid[35], tkeep_in[34:3], tlast_in[2], flag_compression[1], is_header[0]
+	wire		[`TKEEP_WIDTH + 4 - 1				 : 0]	flags_from_eight;		// valid[35], tkeep_in[34:3], tlast_in[2], flag_compression[1], is_header[0]
+	wire 		[`DATA_WIDTH * `NUM_DATA - 1 : 0] cpr_in, cpr_out;
+	wire		[`TAG_WIDTH  * `NUM_DATA - 1 : 0]	tag_out;
+	wire		[`LEN_WIDTH							 - 1 : 0]	len_out;
+  wire		push_cmpfifo, pop_cmpfifo, empty_cmpfifo, full_cmpfifo, almost_full_cmpfifo, valid_eight;
+	wire 		[`MEM_ADDR_WIDTH 																							: 0] 	cmpfifo_count;
+	wire 		[(`DATA_WIDTH + `TAG_WIDTH) * `NUM_DATA + `LEN_WIDTH + `TKEEP_WIDTH + 3 - 1	:	0] 	cmpfifo_in, cmpfifo_out;
+  wire																																			valid_aligner, stall, valid_ali_in, valid_ali_in_;
+	wire		[`TKEEP_WIDTH + 4 																		- 1		: 0]	flags_from_cmpfifo;
+	wire		[3																										- 1		:	0]	flags_from_aligner;
+  wire 		[(`DATA_WIDTH + `TAG_WIDTH) * `NUM_DATA + `LEN_WIDTH	- 1 	:	0]	aligner_in;
+  wire		[`DATA_WIDTH * `NUM_DATA 															-	1		:	0]	aligner_out;
+	wire		[`DATA_WIDTH 						 															- 1		:	0]	tkeep_out_;
+  wire		push_outfifo, pop_outfifo, empty_outfifo, full_outfifo, almost_full_outfifo, align_tlast, tlast_out_, tvalid_out_;
+ 	wire 		[`MEM_ADDR_WIDTH							: 0] 	outfifo_count;
 	
 	assign wrt_en = 1'b1;
 	
@@ -41,9 +60,6 @@ module Compressor (
 		is_header
 	);
 
-	wire 		[`DATA_WIDTH * `NUM_DATA + `TKEEP_WIDTH + 3 - 1 	: 0] 	infifo_in, infifo_out;		// tkeep_in, tlast_in, flag_compression, is_header
-	wire 		[`MEM_ADDR_WIDTH 																	: 0] 	infifo_count;
-	wire																														valid_cpr_in, valid_cpr_out;
 	
 	assign 	infifo_in		=	{data_in, tkeep_in, tlast_in, flag_compression, is_header};
 	assign	tready_out	=	!full_infifo;
@@ -74,11 +90,6 @@ module Compressor (
 		valid_cpr_out
 	);
 
-	wire		[`TKEEP_WIDTH + 4 - 1				 : 0]	flags_from_infifo;	// valid[35], tkeep_in[34:3], tlast_in[2], flag_compression[1], is_header[0]
-	wire		[`TKEEP_WIDTH + 4 - 1				 : 0]	flags_from_eight;		// valid[35], tkeep_in[34:3], tlast_in[2], flag_compression[1], is_header[0]
-	wire 		[`DATA_WIDTH * `NUM_DATA - 1 : 0] cpr_in, cpr_out;
-	wire		[`TAG_WIDTH  * `NUM_DATA - 1 : 0]	tag_out;
-	wire		[`LEN_WIDTH							 - 1 : 0]	len_out;
 
 	assign  flags_from_infifo		= {valid_cpr_out, infifo_out [`TKEEP_WIDTH + 3 - 1 : 0]}; 	
 	assign 	cpr_in 							= infifo_out[`DATA_WIDTH * `NUM_DATA + `TKEEP_WIDTH + 3 - 1 	: `TKEEP_WIDTH + 3];
@@ -99,9 +110,6 @@ module Compressor (
   	flags_from_eight
   );
   
-  wire		push_cmpfifo, pop_cmpfifo, empty_cmpfifo, full_cmpfifo, almost_full_cmpfifo, valid_eight;
-	wire 		[`MEM_ADDR_WIDTH 																							: 0] 	cmpfifo_count;
-	wire 		[(`DATA_WIDTH + `TAG_WIDTH) * `NUM_DATA + `LEN_WIDTH + `TKEEP_WIDTH + 3 - 1	:	0] 	cmpfifo_in, cmpfifo_out;
 	assign 	valid_eight		= flags_from_eight[`TKEEP_WIDTH + 4 - 1];
 	assign 	push_cmpfifo 	= (almost_full_cmpfifo == 1'b0 && valid_eight == 1'b1) ? 1'b1 : 1'b0;
 	assign 	pop_cmpfifo 	= (empty_cmpfifo == 1'b0 && stall == 1'b0) ? 1'b1 : 1'b0;
@@ -123,12 +131,6 @@ module Compressor (
   	cmpfifo_count
   );
 
-  wire																																			valid_aligner, stall, valid_ali_in, valid_ali_in_;
-	wire		[`TKEEP_WIDTH + 4 																		- 1		: 0]	flags_from_cmpfifo;
-	wire		[3																										- 1		:	0]	flags_from_aligner;
-  wire 		[(`DATA_WIDTH + `TAG_WIDTH) * `NUM_DATA + `LEN_WIDTH	- 1 	:	0]	aligner_in;
-  wire		[`DATA_WIDTH * `NUM_DATA 															-	1		:	0]	aligner_out;
-	wire		[`DATA_WIDTH 						 															- 1		:	0]	tkeep_out_;
 	Register #(
 		.BIT_WIDTH(1)
 	) valid_reg1 (
@@ -157,8 +159,6 @@ module Compressor (
   	tkeep_out_
   );
   
-  wire		push_outfifo, pop_outfifo, empty_outfifo, full_outfifo, almost_full_outfifo, align_tlast, tlast_out_, tvalid_out_;
- 	wire 		[`MEM_ADDR_WIDTH							: 0] 	outfifo_count;
 
 	
  	assign  valid_aligner	=	flags_from_aligner[2];
