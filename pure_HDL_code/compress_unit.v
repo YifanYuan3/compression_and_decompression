@@ -23,7 +23,7 @@ assign res_8 = {24'b0, compressor_8_out};
 assign res_16 = {16'b0, compressor_16_out};
 assign res_32 = data_in;
 
-assign exponent = data_in[30:23];
+    assign exponent = {data_in[6:0],data_in[15]};
     
 compressor_8 c8(
     .data_in({data_in[7:0],data_in[15:8],data_in[23:16],data_in[31:24]}), 
@@ -41,12 +41,12 @@ always@ (*) begin
         data_out = res_0;
     end
     else if (exponent < 120) begin
-        bitmap = 2'b10;
-        data_out = res_16;
-    end
-    else if (exponent < 127) begin
         bitmap = 2'b01;
         data_out = res_8;
+    end
+    else if (exponent < 127) begin
+        bitmap = 2'b10;
+        data_out = res_16;
     end
     else begin
         bitmap = 2'b11;
