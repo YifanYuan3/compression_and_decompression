@@ -134,7 +134,7 @@ reg write_1_ready;
 reg special_case;
 
 
-(* mark_debug = "true" *) reg [7:0] data_counter;
+reg [7:0] data_counter;
 
 
 reg [9:0] special_state;
