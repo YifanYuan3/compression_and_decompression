@@ -284,7 +284,8 @@ always@(posedge aclk)begin
                 end
             end
             COMP: begin
-               data_out_concat[15:0] <= bitmap_wire; 
+               data_out_concat[15:0] <= bitmap_wire;
+               data_out_concat[271:16] <= 0; 
                offset_0 <= length_0;
                offset_1 <= length_1;
                offset_2 <= length_2;
@@ -340,7 +341,7 @@ always@(posedge aclk)begin
                 state <= MERGE2;
             end*/
             MERGE1: begin   
-                data_out_concat <= ((data_out_shift_0 | data_out_shift_1) | (data_out_shift_2 | data_out_shift_3)) | ((data_out_shift_4 | data_out_shift_5) | (data_out_shift_6 | data_out_shift_7));
+                data_out_concat <= data_out_concat | ((data_out_shift_0 | data_out_shift_1) | (data_out_shift_2 | data_out_shift_3)) | ((data_out_shift_4 | data_out_shift_5) | (data_out_shift_6 | data_out_shift_7));
                 state <= MERGE3;
             end
             MERGE3: begin
