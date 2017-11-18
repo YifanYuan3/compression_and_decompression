@@ -1,12 +1,12 @@
 module frontend_top(
- (* mark_debug = "true" *)   input          aclk,
+    input          aclk,
     input          aresetn,
 
    input [255:0]  axis_tdata,
    input [31 :0]  axis_tkeep,
-  (* mark_debug = "true" *)  input          axis_tvalid,
-  (* mark_debug = "true" *)  input          axis_tlast,
-  (* mark_debug = "true" *)  output   reg   axis_tready1,
+   input          axis_tvalid,
+   input          axis_tlast,
+   output   reg   axis_tready1,
 
     output reg [255:0]  dma_tdata,
 output reg [31 :0]  dma_tkeep,
@@ -29,9 +29,10 @@ parameter OFFSET4 =         20'b00000_00000_00100_00000 ;
 parameter DECOMP =          20'b00000_00000_01000_00000 ;
 parameter WRITE_DECOMP =    20'b00000_00000_10000_00000 ;
 parameter SPECIAL_CASE =    20'b00000_00001_00000_00000 ;
-parameter BUFFER1 =         20'b00000_00010_00000_00000 ;
+parameter ERROR1 =          20'b00000_00010_00000_00000 ;
+parameter ERROR2 =          20'b00000_00100_00000_00000 ;
 
-(* mark_debug = "true" *) reg [19:0]  state;
+reg [19:0]  state;
 
 wire [15:0] length;
 wire [15:0] eth_type;
@@ -48,15 +49,15 @@ assign length = {axis_tdata[135:128],axis_tdata[143:136]} + 16'd14;
 
 assign ToS = axis_tdata[127:120];
 
-assign need_decomp = (ip_protocol == 8'h06) && (ToS == 8'h28) && (length == 16'd1514);
+assign need_decomp = (ip_protocol == 8'h06) && (ToS != 0) && (length == 16'd1514);
 
 
-(* mark_debug = "true" *) reg [255:0] concat_1;
-(* mark_debug = "true" *) wire [255:0] concat_2;
+ reg [255:0] concat_1;
+ wire [255:0] concat_2;
 assign concat_2 = axis_tdata;
 
-(* mark_debug = "true" *) reg [15:0] bitmap_in;
-(* mark_debug = "true" *) reg [11:0]  cursor;
+ reg [15:0] bitmap_in;
+ reg [11:0]  cursor;
 
 wire [9:0] offset_reg0;
 wire [9:0] offset_reg1;
@@ -67,16 +68,16 @@ wire [9:0] offset_reg5;
 wire [9:0] offset_reg6;
 wire [9:0] offset_reg7;
 
-(* mark_debug = "true" *) reg [9:0] real_offset0;
-(* mark_debug = "true" *) reg [9:0] real_offset1;
-(* mark_debug = "true" *) reg [9:0] real_offset2;
-(* mark_debug = "true" *) reg [9:0] real_offset3;
-(* mark_debug = "true" *) reg [9:0] real_offset4;
-(* mark_debug = "true" *) reg [9:0] real_offset5;
-(* mark_debug = "true" *) reg [9:0] real_offset6;
-(* mark_debug = "true" *) reg [9:0] real_offset7;
+ reg [9:0] real_offset0;
+ reg [9:0] real_offset1;
+ reg [9:0] real_offset2;
+ reg [9:0] real_offset3;
+ reg [9:0] real_offset4;
+ reg [9:0] real_offset5;
+ reg [9:0] real_offset6;
+ reg [9:0] real_offset7;
 
-(* mark_debug = "true" *) reg [9:0] real_offset_cursor;
+ reg [9:0] real_offset_cursor;
 
 new_bt bt_inst(
     .aclk(aclk),
@@ -139,6 +140,7 @@ reg special_case;
 reg [9:0] special_state;
 
 reg   axis_tready;
+reg is_last;
 
 always@(*)begin
     if(state[0] || state[2])begin
@@ -347,15 +349,21 @@ always@(posedge aclk)begin
                     if(data_counter < 8'd47 )begin
                         dma_tvalid <= 0;
                         if(cursor >= 12'd256)begin
-                            cursor <= cursor - 12'd256;
-                            axis_tready <= 1;
-                            concat_1 <= axis_tdata;
-                            if(cursor > 12'd496)begin
-                                state <= SPECIAL_CASE;
-                                special_state <= CONCAT;
+                            if(is_last == 1)begin
+                                axis_tready <= 0;
+                                state <= ERROR1;
                             end
                             else begin
-                                state <= CONCAT;
+                                cursor <= cursor - 12'd256;
+                                axis_tready <= 1;
+                                concat_1 <= axis_tdata;
+                                if(cursor > 12'd496)begin
+                                    state <= SPECIAL_CASE;
+                                    special_state <= CONCAT;
+                                end
+                                else begin
+                                    state <= CONCAT;
+                                end
                             end
                         end
                         else if(cursor == 12'd248 && concat[263:248] == 16'hffff)begin
@@ -381,13 +389,23 @@ always@(posedge aclk)begin
                     else begin
                         dma_tvalid <= 0;
                         dma_tlast <= 0;
+                        axis_tready <= 1;
                         if(cursor > 12'd256)begin
-                            axis_tready <= 1;
-                            state <= SPECIAL_CASE;
-                            special_state <= IDLE;
+                            if(is_last == 1)begin
+                                state <= IDLE;
+                            end
+                            else begin
+                                state <= SPECIAL_CASE;
+                                special_state <= IDLE;
+                            end
                         end
                         else begin
-                            state <= IDLE;
+                            if(is_last != 1)begin
+                                state <= ERROR2;
+                            end
+                            else begin
+                                state <= IDLE;
+                            end
                         end
                     end
                 end
@@ -399,10 +417,55 @@ always@(posedge aclk)begin
             SPECIAL_CASE: begin  //1024
                 if(axis_tvalid == 1)begin
                     axis_tready <= (special_state == CONCAT)?0:1;
-                    state <= special_state;
+                    if(special_state == IDLE && axis_tlast != 1)begin   
+                        state <= ERROR2;
+                    end
+                    else begin
+                        state <= special_state;
+                    end
                 end
                 else begin
                     state <= SPECIAL_CASE;
+                end
+            end
+
+            ERROR1: begin
+                if(dma_tready == 1)begin
+                    if(data_counter < 8'd47)begin   
+                        data_counter <= data_counter + 1;
+                        dma_tdata <= 0;
+                        dma_tkeep <= 32'hffffffff;
+                        dma_tvalid <= 1;
+                        state <= ERROR1;
+                    end
+                    else if(data_counter == 8'd47) begin
+                        data_counter <= data_counter + 1;
+                        dma_tdata <= 0;
+                        dma_tkeep <= 32'h000003ff;
+                        dma_tvalid <= 1;
+                        dma_tlast <= 1;
+                        state <= ERROR1;
+                    end
+                    else begin
+                        data_counter <= 0;
+                        dma_tvalid <= 0;
+                        dma_tlast <= 0;
+                        state <= IDLE;
+                        axis_tready <= 1;
+                    end
+                end
+                else begin
+                    state <= ERROR1;
+                end
+            end
+
+            ERROR2: begin
+                axis_tready <= 1;
+                if(axis_tvalid == 1 && axis_tlast == 1)begin
+                    state <= IDLE;
+                end
+                else begin
+                    state <= ERROR2;
                 end
             end
 
@@ -413,6 +476,16 @@ always@(posedge aclk)begin
         endcase
     end
 
+end
+
+
+always@(posedge aclk)begin
+    if(axis_tready == 1 && axis_tvalid == 1)begin  
+        is_last <= axis_tlast;
+    end
+    else begin
+        is_last <= is_last;
+    end
 end
 
 endmodule
