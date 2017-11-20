@@ -51,7 +51,9 @@ assign length = {axis_tdata[135:128],axis_tdata[143:136]} + 16'd14;
 
 assign ToS = axis_tdata[127:120];
 
-assign need_decomp = (ip_protocol == 8'h06) && (ToS != 0) && (length == 16'd1514);
+
+
+assign need_decomp = /*(ip_protocol == 8'h06) &&*/ (ToS == 8'h28 || ToS == 8'h20) && (length == 16'd1514) ;
 
 
 reg [255:0] data_in;
@@ -125,6 +127,8 @@ reg [7:0] data_counter;
 
 reg special_case;
 
+
+
 always@(*)begin
     if(state[0] /*|| state[2]*/)begin
         axis_tready1 <= dma_tready;
@@ -175,7 +179,7 @@ always@(posedge aclk)begin
         out_buffer <= 0;
         data_in <= 0;
         special_case <= 0;
-        
+
         
         
         
@@ -190,6 +194,7 @@ always@(posedge aclk)begin
                 dma_tvalid <= axis_tvalid;
                 axis_tready <= 1;
                 if(axis_tvalid == 1 )begin
+                   
                     need_decomp_reg <= need_decomp;
                     if(need_decomp == 1)begin
                         state <= WRITE_HEADER;
@@ -216,14 +221,20 @@ always@(posedge aclk)begin
             WRITE_HEADER: begin  //8
                 
                     if(data_counter < 8'd3)begin                       
-                        state <= WRITE_HEADER;
+                        
                         if(dma_tready == 1) begin
                             dma_tdata <= axis_tdata;
                             dma_tvalid <= axis_tvalid;
                             dma_tkeep <= axis_tkeep;
                             dma_tlast <= axis_tlast;
                             data_counter <= data_counter + axis_tvalid;
-                            //axis_tready <= 1;
+                            if(data_counter == 8'd2 && axis_tvalid == 1 && axis_tdata[167:128] == 40'h04f1a50000)begin
+                                need_decomp_reg <= 0;
+                                state <= BYPASS;
+                            end
+                            else begin
+                                state <= WRITE_HEADER;
+                            end
                         end
                         else begin
                             dma_tdata <=  dma_tdata;
@@ -231,7 +242,7 @@ always@(posedge aclk)begin
                             dma_tkeep <=  dma_tkeep;
                             dma_tlast <=  dma_tlast;
                             data_counter <= data_counter;
-                            //axis_tready <= 0;
+                            state <= WRITE_HEADER;
                         end
                     end
                     else if(data_counter == 8'd3)begin

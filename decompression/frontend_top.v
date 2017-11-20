@@ -48,8 +48,10 @@ assign ip_protocol = axis_tdata[191:184];
 assign length = {axis_tdata[135:128],axis_tdata[143:136]} + 16'd14;
 
 assign ToS = axis_tdata[127:120];
+reg new_ip1;
+reg [7:0] ToS_reg;
 
-assign need_decomp = (ip_protocol == 8'h06) && (ToS != 0) && (length == 16'd1514);
+assign need_decomp = /*(ip_protocol == 8'h06) &&*/ (ToS == 8'h28 || ToS == 8'h20) && (length == 16'd1514) && (!new_ip1 || ToS != ToS_reg);
 
 
  reg [255:0] concat_1;
@@ -142,6 +144,7 @@ reg [9:0] special_state;
 reg   axis_tready;
 reg is_last;
 
+
 always@(*)begin
     if(state[0] || state[2])begin
         axis_tready1 <= dma_tready;
@@ -181,6 +184,8 @@ always@(posedge aclk)begin
         need_decomp_reg <= 0;
         data_counter <= 0;
         special_state <= 0;
+        new_ip1 <= 1;
+        ToS_reg <= 8'd11;
     end 
     else begin
         case(state)
@@ -191,6 +196,8 @@ always@(posedge aclk)begin
                 dma_tvalid <= axis_tvalid;
                 axis_tready <= 1;
                 if(axis_tvalid == 1 )begin
+                    new_ip1 <= (length != 16'd1514) && ((ToS == 8'h28) || (ToS == 8'h20));
+                    ToS_reg <= ((ToS == 8'h28) || (ToS == 8'h20))? ToS: ToS_reg;
                     need_decomp_reg <= need_decomp;
                     if(need_decomp == 1)begin
                         state <= WRITE_HEADER;
@@ -247,6 +254,7 @@ always@(posedge aclk)begin
                         dma_tdata <= dma_tdata;
                     end
                     else begin
+                        dma_tvalid <= 0;
                         state <= WRITE_HEADER;
                     end                   
             end
